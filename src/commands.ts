@@ -16,8 +16,6 @@ export function handleCommand(message : Message) {
             instance.execute();
             break;
     }
-
-    seperateCommandParts(message.content);
 }
 
 
