@@ -6,7 +6,7 @@ export class CreatePartyCommand {
 
     guild : Guild;
     creator : User;
-    users : User[];
+    mentions : User[];
     partyChannel : Channel|undefined = undefined;
 
     constructor(message : Message) {
@@ -14,7 +14,7 @@ export class CreatePartyCommand {
             throw exception();
         this.guild = message.guild;
         this.creator = message.author;
-        this.users = this.extractUsers(message.mentions);
+        this.mentions = this.extractUsers(message.mentions);
     }
 
     async execute() {
@@ -54,7 +54,7 @@ export class CreatePartyCommand {
     private createPermissionOverwriteArray() : OverwriteData[] {
         let permissionOverwrites : OverwriteData[] = [];
 
-        this.users.forEach((user) => {
+        this.mentions.forEach((user) => {
             let overwrite = this.createUserPermissionOverwrite(user);
             permissionOverwrites.push(overwrite);
         });
