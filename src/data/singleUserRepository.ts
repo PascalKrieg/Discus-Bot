@@ -1,39 +1,77 @@
-import { User, Channel } from "discord.js";
+import { User, Channel, Snowflake } from "discord.js";
 import { TokenPair } from "../spotify/tokenPair";
 import { AuthenticatedUser } from "./authenticatedUser";
+import { PartyChannel } from "./partyChannel";
 import { Repository } from "./repository";
 
 
 export class SingleUserRepository implements Repository {
+    users : AuthenticatedUser[] = [];
+    partyChannels : PartyChannel[] = [];
+
     addUser(user: User, tokenPair: TokenPair): void {
-        throw new Error("Method not implemented.");
+        this.users.push(new AuthenticatedUser(user.id, tokenPair));
     }
+
     addPartyChannel(channel: Channel, owner: User): void {
-        throw new Error("Method not implemented.");
+        try {
+            let user = this.users.find((value) => {
+                return value.userId === owner.id;
+            });
+            if (user) {
+                this.partyChannels.push(new PartyChannel(user, channel, new Date()));
+            } else {
+                throw new Error("User not registered!");
+            }
+        } catch (err) {
+            // DELETE ZOMBIE CHANNEL!!
+        }
     }
+
     getPartyChannelIds(): string[] {
-        throw new Error("Method not implemented.");
+        return this.partyChannels.map(partyChannel => partyChannel.channel.id);
     }
     getPartyChannelOwner(channelId: string): AuthenticatedUser {
-        throw new Error("Method not implemented.");
+        let partyChannel = this.partyChannels.find((partyChannel) => {
+            return partyChannel.channel.id === channelId;
+        });
+        if (partyChannel) {
+            return partyChannel.owner;
+        } else {
+            throw new Error("Party channel does not exist!");
+        }
     }
     getTokenPairByUserId(userId: string): TokenPair {
-        throw new Error("Method not implemented.");
+        let user = this.users.find((value) => {
+            return value.userId === userId;
+        });
+        if (user) {
+            return user.tokenPair;
+        } else {
+            throw new Error("User not registered!");
+        }
     }
-    isUserRegistered(user: User): boolean {
-        throw new Error("Method not implemented.");
+
+    isUserRegistered(userId : string): boolean {
+        return undefined == this.users.find((value) => {
+            return value.userId === userId;
+        });
     }
+
     isChannelPartyChannel(channelId: string): boolean {
-        throw new Error("Method not implemented.");
+        return undefined == this.partyChannels.find((value) => {
+            return value.channel.id === channelId;
+        });
     }
     updateUserToken(user: User, tokenPair: TokenPair): void {
-        throw new Error("Method not implemented.");
+        this.deleteUserToken(user.id);
+        this.users.push(new AuthenticatedUser(user.id, tokenPair));
     }
     deleteChannel(channelId: string): void {
-        throw new Error("Method not implemented.");
+        this.partyChannels.filter(partyChannel => partyChannel.channel.id === channelId);
     }
     deleteUserToken(userId: string): void {
-        throw new Error("Method not implemented.");
+        this.users.filter(user => user.userId === userId);
     }
 
 }

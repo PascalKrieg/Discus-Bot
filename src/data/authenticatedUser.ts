@@ -1,12 +1,11 @@
+import { TokenPair } from "../spotify/tokenPair";
 
 export class AuthenticatedUser {
-    userId : String;
-    accessToken : String;
-    refreshToken : String;
+    userId : string;
+    tokenPair : TokenPair;
 
-    constructor(userId : String, accessToken : String, refreshToken : String) {
+    constructor(userId : string, tokenPair : TokenPair) {
         this.userId = userId;
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
+        this.tokenPair = tokenPair;
     }
 }
