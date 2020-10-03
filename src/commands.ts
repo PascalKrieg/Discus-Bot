@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 
-import { PartyCommandInstance } from "./partyCommandInstance"
+import { CreatePartyCommand } from "./createPartyCommand"
 
 const commandPrefix = "$";
 
@@ -12,7 +12,7 @@ export function handleCommand(message : Message) {
 
     switch(commandParts.command) {
         case "createparty":
-            let instance : PartyCommandInstance = new PartyCommandInstance(message);
+            let instance : CreatePartyCommand = new CreatePartyCommand(message);
             instance.execute();
             break;
     }

@@ -2,7 +2,7 @@ import { exception } from "console";
 import { Channel, Guild, GuildCreateChannelOptions, Message, MessageMentions, OverwriteData, User } from "discord.js";
 
 
-export class PartyCommandInstance {
+export class CreatePartyCommand {
 
     guild : Guild;
     creator : User;
