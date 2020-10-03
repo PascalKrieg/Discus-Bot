@@ -20,7 +20,7 @@ export function handleCommand(message : Message) {
 
 
 function isMessageBotCommand(message : Message) {
-    return message.channel.type == "text" || message.content.slice(0, commandPrefix.length - 1) == commandPrefix;
+    return message.channel.type == "text" && message.content.slice(0, commandPrefix.length - 1) == commandPrefix;
 }
 
 function seperateCommandParts(fullComandString : String) {
