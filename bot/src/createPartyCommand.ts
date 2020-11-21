@@ -1,5 +1,6 @@
 import { exception } from "console";
 import { Channel, Guild, GuildCreateChannelOptions, Message, MessageMentions, OverwriteData, User } from "discord.js";
+import { Repository } from "./data/repository";
 
 
 export class CreatePartyCommand {
@@ -8,13 +9,15 @@ export class CreatePartyCommand {
     creator : User;
     mentions : User[];
     partyChannel : Channel|undefined = undefined;
+    repository : Repository;
 
-    constructor(message : Message) {
+    constructor(message : Message, repository : Repository) {
         if (!message.guild)
             throw exception();
         this.guild = message.guild;
         this.creator = message.author;
         this.mentions = this.extractUsers(message.mentions);
+        this.repository = repository;
     }
 
     async execute() {
@@ -25,6 +28,7 @@ export class CreatePartyCommand {
         let channelName = this.createChannelName();
         let options = this.createOptionsObject();
         this.partyChannel = await this.guild.channels.create(channelName, options);
+        this.repository.addPartyChannel(this.partyChannel, this.creator);
     }
 
     private extractUsers(mentions : MessageMentions) : User[] {

@@ -3,7 +3,6 @@ import { request } from "https";
 import { TokenPair } from "./tokenPair";
 import { User } from "discord.js";
 import { resolve } from "path";
-import { rejects } from "assert";
 
 export class SpotifyAPI {
     readonly minimumTokenTimeRemaining = 60;
@@ -57,9 +56,9 @@ export class SpotifyAPI {
     }
 
     async getTrackURIFromLink(link : string) : Promise<string> {
-        let splitAtSlash = link.split("/");
-        if (splitAtSlash[0].indexOf("link.tospotify.com") !== -1) {
-            return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
+            let splitAtSlash = link.split("/");
+            if (splitAtSlash[0].indexOf("link.tospotify.com") !== -1) {
                 request({
                     hostname : "link.tospotify.com",
                     port : 443,
@@ -72,14 +71,36 @@ export class SpotifyAPI {
                         reject(new Error());
                     }
                 }).end();
-            })
-        } else {
-            throw new Error();
-        }
+            } else {
+                resolve(this.extractSpotifyURI(link));
+            }
+        })
     }
 
     openSpotifyLinkToTrackURI(link : string) : string {
-        return "";
+        let spotifyURI : string = link.slice(link.lastIndexOf("/") + 1 , link.indexOf("?"));
+        return spotifyURI;
+    }
+
+    isSpotifyURL(sharedLink : string) : boolean {
+        return this.checkForSpotifyURL(sharedLink) || this.checkForToSpotifyURL(sharedLink);
+    }
+
+    extractSpotifyURI(spotifyLink: string): string {
+        let searchString : string = "spotify:track:";
+        let spotifyURI : string = spotifyLink.slice(spotifyLink.indexOf(searchString) + searchString.length);
+
+        return spotifyURI;
+    }
+
+    checkForSpotifyURL(sharedLink : string): boolean{
+        let spotifyDomain : string = "spotify.com";
+        return sharedLink.includes(spotifyDomain);
+    }
+
+    checkForToSpotifyURL(sharedLink : string) : boolean {
+        let spotifyDomain : string = "tospotify.com";
+        return sharedLink.includes(spotifyDomain);
     }
 
     async fetchTokenPair(code : string) : Promise<TokenPair> {

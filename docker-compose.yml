@@ -1,0 +1,19 @@
+
+services:
+  bot:
+    build: ./bot
+    env_file: bot-environment.env
+  
+  registration:
+    build: ./registration
+    ports:
+      - 9897:9897
+
+  database:
+    image: mariadb
+    restart: always
+    env_file: mariadb-environment.env
+    ports: 
+      - 3306:3306
+    volumes: 
+      - ./database_init:/docker-entrypoint-initdb.d

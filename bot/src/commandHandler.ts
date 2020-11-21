@@ -1,4 +1,4 @@
-import { Message, Shard } from "discord.js";
+import { Message } from "discord.js";
 import { CreatePartyCommand } from "./createPartyCommand"
 import { Repository } from "./data/repository";
 import { SpotifyAPI } from "./spotify/spotifyApi";
@@ -17,30 +17,43 @@ export class CommandHandler {
     }
 
     handleCommand(message : Message) {
-        if (!this.isMessageBotCommand(message))
-            return;
-
+        if (this.isMessageBotCommand(message)) {
+            this.handleBotCommand(message);
+        }
 
         if(this.repository.isChannelPartyChannel(message.channel.id)){
             this.handlePartyChannelCommand(message);
             return;
-        }    
+        }
+    }
 
+    handlePartyChannelCommand(message: Message) {
+        let owner = this.repository.getPartyChannelOwner(message.channel.id);
+        let commandParts = this.seperateCommandParts(message.content);
+        let urls = commandParts.parameters.filter((value) => this.spotifyApi.isSpotifyURL(value));
+        if (urls.length == 0)
+            return;
+
+        this.spotifyApi.getTrackURIFromLink(urls[0]).then(trackURI => {
+            this.spotifyApi.addToQueue(owner.userId, trackURI);
+        });
+    }
+
+    handleBotCommand(message : Message) {
         let commandParts = this.seperateCommandParts(message.content);
 
         switch(commandParts.command) {
             case "createparty":
-                let instance : CreatePartyCommand = new CreatePartyCommand(message);
+                let instance : CreatePartyCommand = new CreatePartyCommand(message, this.repository);
                 instance.execute();
+                break;
+            case "registerme":
+                this.spotifyApi.refreshToken(commandParts.parameters[0], message.author)
                 break;
         }
     }
 
-    handlePartyChannelCommand(message: Message){
-        
-    }
-
-    isMessageBotCommand(message : Message) {
+    isMessageBotCommand(message : Message) : boolean {
         return message.channel.type == "text" && message.content.slice(0, this.commandPrefix.length - 1) == this.commandPrefix;
     }
 
@@ -52,33 +65,6 @@ export class CommandHandler {
         let data = {command : command, parameters : parameters};
         return data
     }
-
-
-    
-    extractSpotifyURI(spotifyLink: string): string {
-        let searchString : string = "spotify:track:";
-        let spotifyURI : string = spotifyLink.slice(spotifyLink.indexOf(searchString) + searchString.length);
-
-        return spotifyURI;
-
-    }
-
-    //gets Spotify URI from a shared Link
-    extractSpotifyURIShared(sharedLink :string): string{
-
-        let spotifyURI : string = sharedLink.slice(sharedLink.lastIndexOf("/") + 1 , sharedLink.indexOf("?"));
-
-        return  spotifyURI;
-    }
-
-    //returns true if a sharedLink contains the spotify.com domain
-    checkForSpotifyURL(sharedLink : string): boolean{
-
-        let spotifyDomain : string = "spotify.com";
-
-        return sharedLink.includes(spotifyDomain);
-    }
-
     
 }
 

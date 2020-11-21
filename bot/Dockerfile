@@ -3,7 +3,7 @@
 #
 # dockerfile
 # the first image use node image as the builder because it has git program
-FROM node as builder
+FROM node:12 as builder
 
 WORKDIR /app
 
@@ -21,7 +21,7 @@ RUN npm prune --production
 
 # ===============
 # the second image use node:slim image as the runtime
-FROM node:slim as runtime
+FROM node:14-slim as runtime
 
 WORKDIR /app
 ENV NODE_ENV=production
