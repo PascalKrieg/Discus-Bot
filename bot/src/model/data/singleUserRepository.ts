@@ -1,16 +1,17 @@
 import { User, Channel, Snowflake } from "discord.js";
-import { TokenPair } from "../spotify/tokenPair";
+import { TokenPair } from "./tokenPair";
 import { AuthenticatedUser } from "./authenticatedUser";
 import { PartyChannel } from "./partyChannel";
 import { Repository } from "./repository";
+import { injectable } from "inversify";
 
-
+@injectable()
 export class SingleUserRepository implements Repository {
     users : AuthenticatedUser[] = [];
     partyChannels : PartyChannel[] = [];
 
     addUser(user: User, tokenPair: TokenPair): void {
-        this.users.push(new AuthenticatedUser(user.id, tokenPair));
+        this.users.push(new AuthenticatedUser(user.id, user.tag, tokenPair));
     }
 
     addPartyChannel(channel: Channel, owner: User): void {
@@ -65,7 +66,7 @@ export class SingleUserRepository implements Repository {
     }
     updateUserToken(user: User, tokenPair: TokenPair): void {
         this.deleteUserToken(user.id);
-        this.users.push(new AuthenticatedUser(user.id, tokenPair));
+        this.users.push(new AuthenticatedUser(user.id, user.tag, tokenPair));
     }
     deleteChannel(channelId: string): void {
         this.partyChannels.filter(partyChannel => partyChannel.channel.id === channelId);

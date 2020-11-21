@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
-import { CreatePartyCommand } from "./createPartyCommand"
-import { Repository } from "./data/repository";
-import { SpotifyAPI } from "./spotify/spotifyApi";
+import { CreatePartyCommand } from "../model/commands/createPartyCommand"
+import { Repository } from "../model/data/repository";
+import { SpotifyAPI } from "../model/spotifyApi";
 
 
 export class CommandHandler {

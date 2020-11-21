@@ -1,7 +1,10 @@
 import Discord from "discord.js";
-import { CommandHandler } from "./commandHandler"
-import { SingleUserRepository } from "./data/singleUserRepository";
-import { SpotifyAPI } from "./spotify/spotifyApi";
+import { DIContainer } from "./dependencyInjection/inversify.config";
+import { TYPES } from "./dependencyInjection/types";
+import { Repository } from "./model/data/repository";
+
+import { CommandHandler } from "./controller/commandHandler";
+import { SpotifyAPI } from "./model/spotifyApi";
 
 const client = new Discord.Client();
 
@@ -15,7 +18,7 @@ if (!process.env.SPOTIFY_ID || !process.env.SPOTIFY_SECRET || !process.env.DISCO
 }
 
 const redirectUri = "http://localhost:8000";
-let repository = new SingleUserRepository();
+let repository = DIContainer.get<Repository>(TYPES.Repository);
 let spotifyApi = new SpotifyAPI(repository, process.env.SPOTIFY_ID, process.env.SPOTIFY_SECRET, redirectUri);
 
 let handler = new CommandHandler(repository, spotifyApi);

@@ -1,8 +1,7 @@
-import { Repository } from "../data/repository";
+import { Repository } from "./data/repository";
 import { request } from "https";
-import { TokenPair } from "./tokenPair";
+import { TokenPair } from "./data/tokenPair";
 import { User } from "discord.js";
-import { resolve } from "path";
 
 export class SpotifyAPI {
     readonly minimumTokenTimeRemaining = 60;

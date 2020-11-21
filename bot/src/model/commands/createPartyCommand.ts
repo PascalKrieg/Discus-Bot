@@ -1,6 +1,5 @@
-import { exception } from "console";
 import { Channel, Guild, GuildCreateChannelOptions, Message, MessageMentions, OverwriteData, User } from "discord.js";
-import { Repository } from "./data/repository";
+import { Repository } from "../data/repository";
 
 
 export class CreatePartyCommand {
@@ -13,7 +12,7 @@ export class CreatePartyCommand {
 
     constructor(message : Message, repository : Repository) {
         if (!message.guild)
-            throw exception();
+            throw new Error();
         this.guild = message.guild;
         this.creator = message.author;
         this.mentions = this.extractUsers(message.mentions);

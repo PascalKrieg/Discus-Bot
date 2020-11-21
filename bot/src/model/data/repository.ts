@@ -1,5 +1,5 @@
 import { Channel, Snowflake, User } from "discord.js";
-import { TokenPair } from "../spotify/tokenPair";
+import { TokenPair } from "./tokenPair";
 import { AuthenticatedUser } from "./authenticatedUser";
 
 export interface Repository {
