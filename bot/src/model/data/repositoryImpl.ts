@@ -7,6 +7,15 @@ import { injectable } from "inversify";
 
 @injectable()
 export class RepositoryImpl implements Repository {
+    getTokenPairByUserId(userId: string): AuthenticatedUser {
+        throw new Error("Method not implemented.");
+    }
+    addCodeRequest(user: string, state: string): number {
+        throw new Error("Method not implemented.");
+    }
+    retreiveCodeRequest(state: string): string {
+        throw new Error("Method not implemented.");
+    }
     addUser(user: User, tokenPair: TokenPair): void {
         throw new Error("Method not implemented.");
     }
@@ -19,9 +28,7 @@ export class RepositoryImpl implements Repository {
     getPartyChannelOwner(channelId: string): AuthenticatedUser {
         throw new Error("Method not implemented.");
     }
-    getTokenPairByUserId(userId: string): TokenPair {
-        throw new Error("Method not implemented.");
-    }
+
     isUserRegistered(userId: string): boolean {
         throw new Error("Method not implemented.");
     }

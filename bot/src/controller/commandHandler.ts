@@ -1,11 +1,12 @@
 import { Message } from "discord.js";
+import { Command } from "../model/commands/command";
 import { CreatePartyCommand } from "../model/commands/createPartyCommand"
+import { RegisterMeCommand } from "../model/commands/registerMeCommand";
 import { Repository } from "../model/data/repository";
 import { SpotifyAPI } from "../model/spotifyApi";
 
 
 export class CommandHandler {
-
     readonly commandPrefix = "$";
     repository : Repository;
     spotifyApi : SpotifyAPI;
@@ -40,16 +41,22 @@ export class CommandHandler {
     }
 
     handleBotCommand(message : Message) {
-        let commandParts = this.seperateCommandParts(message.content);
-
-        switch(commandParts.command) {
-            case "createparty":
-                let instance : CreatePartyCommand = new CreatePartyCommand(message, this.repository);
-                instance.execute();
-                break;
-            case "registerme":
-                this.spotifyApi.refreshToken(commandParts.parameters[0], message.author)
-                break;
+        try {
+            let commandParts = this.seperateCommandParts(message.content);
+    
+            let instance : Command;
+            switch(commandParts.command) {
+                case "createparty":
+                    instance = new CreatePartyCommand(message, this.repository);
+                    instance.execute();
+                    break;
+                case "registerme":
+                    instance = new RegisterMeCommand(message, this.repository, this.spotifyApi);
+                    instance.execute();
+                    break;
+            }
+        } catch (err) {
+            console.error(err);
         }
     }
 

@@ -16,7 +16,10 @@ CREATE TABLE IF NOT EXISTS playback_enq.party_channels (
 );
 
 CREATE TABLE IF NOT EXISTS playback_enq.code_requests (
+    request_id int NOT NULL AUTO_INCREMENT,
     discord_user int NOT NULL,
-    request_state varchar(255),
+    request_state varchar(255) NOT NULL,
+    code varchar(255),
+    PRIMARY KEY (request_id),
     FOREIGN KEY (discord_user) REFERENCES discord_users(id)
 );

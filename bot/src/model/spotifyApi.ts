@@ -18,6 +18,11 @@ export class SpotifyAPI {
         this.redirectUri = redirectUri;
     }
     
+    getRegisterUrl(state : string) : string {
+        let url = "https://accounts.spotify.com/authorize" 
+            + `?client_id=${this.clientId}&response_type=code&redirect_uri=${this.redirectUri}&state=${state}&scope=user-modify-playback-state`;
+        return url;
+    }
     
     async refreshToken(refreshToken : string, user : User) {
         this.fetchTokenPair(refreshToken).then((tokenPair) => {
@@ -26,7 +31,7 @@ export class SpotifyAPI {
     }
 
     async addToQueue(userId : string, trackURI : string) {
-        let tokenPair = this.repository.getTokenPairByUserId(userId);
+        let tokenPair = this.repository.getTokenPairByUserId(userId).tokenPair;
         this.refreshTokenIfExpiringSoon(tokenPair).then(result => {
             let options = this.createPostSongOptions(trackURI, tokenPair.accessToken);
         

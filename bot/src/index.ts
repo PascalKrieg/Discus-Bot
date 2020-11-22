@@ -17,9 +17,13 @@ if (!process.env.SPOTIFY_ID || !process.env.SPOTIFY_SECRET || !process.env.DISCO
     process.exit(-1);
 }
 
-const redirectUri = "http://localhost:8000";
+if (!process.env.REDIRECT_URI) {
+    console.error("REDIRECT_URI not set.")
+    process.exit(-1);
+}
+
 let repository = DIContainer.get<Repository>(TYPES.Repository);
-let spotifyApi = new SpotifyAPI(repository, process.env.SPOTIFY_ID, process.env.SPOTIFY_SECRET, redirectUri);
+let spotifyApi = new SpotifyAPI(repository, process.env.SPOTIFY_ID, process.env.SPOTIFY_SECRET, process.env.REDIRECT_URI);
 
 let handler = new CommandHandler(repository, spotifyApi);
 client.on('message', handler.handleCommand);

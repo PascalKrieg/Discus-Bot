@@ -4,11 +4,11 @@ import { AuthenticatedUser } from "./authenticatedUser";
 
 export interface Repository {
     addUser(user : User, tokenPair : TokenPair) : void;
-    addPartyChannel(channel : Channel, owner : User) : void;
+    addPartyChannel(channel : Channel, owner : User, autoDelete? : Date) : void;
 
     getPartyChannelIds() : Array<Snowflake>;
     getPartyChannelOwner(channelId : Snowflake) : AuthenticatedUser;
-    getTokenPairByUserId(userId : Snowflake) : TokenPair;
+    getTokenPairByUserId(userId : Snowflake) : AuthenticatedUser;
 
     isUserRegistered(userId : Snowflake) : boolean;
     isChannelPartyChannel(channelId : Snowflake) : boolean;
@@ -17,4 +17,7 @@ export interface Repository {
 
     deleteChannel(channelId : Snowflake) : void;
     deleteUserToken(userId : Snowflake) : void;
+
+    addCodeRequest(userId : Snowflake, state : string) : number;
+    retreiveCodeRequest(state : string) : string;
 }
