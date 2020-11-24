@@ -1,118 +1,94 @@
-import { Repository } from "./data/repository";
-import { request } from "https";
+import { request, RequestOptions } from "https";
 import { TokenPair } from "./data/tokenPair";
-import { User } from "discord.js";
+import { Repository } from "./data/repository"
+import * as Logging from "../logging";
+let logger = Logging.buildLogger("spotifyApi");
 
 export class SpotifyAPI {
     readonly minimumTokenTimeRemaining = 60;
 
-    repository : Repository;
     clientId : string;
     clientSecret : string;
     redirectUri : string;
 
-    constructor(repository : Repository, clientId : string, clientSecret : string, redirectUri : string) {
-        this.repository = repository;
+    repository : Repository;
+
+    constructor(clientId : string, clientSecret : string, redirectUri : string, repository : Repository)  {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.redirectUri = redirectUri;
+        this.repository = repository;
     }
     
     getRegisterUrl(state : string) : string {
         let url = "https://accounts.spotify.com/authorize" 
-            + `?client_id=${this.clientId}&response_type=code&redirect_uri=${this.redirectUri}&state=${state}&scope=user-modify-playback-state`;
+            + `?client_id=${this.clientId}&response_type=code&show_dialog=true&redirect_uri=${encodeURIComponent(this.redirectUri)}&state=${encodeURIComponent(state)}&scope=user-modify-playback-state`;
         return url;
     }
-    
-    async refreshToken(refreshToken : string, user : User) {
-        this.fetchTokenPair(refreshToken).then((tokenPair) => {
-            this.repository.updateUserToken(user, tokenPair)
-        })  
-    }
 
-    async addToQueue(userId : string, trackURI : string) {
-        let tokenPair = this.repository.getTokenPairByUserId(userId).tokenPair;
-        this.refreshTokenIfExpiringSoon(tokenPair).then(result => {
-            let options = this.createPostSongOptions(trackURI, tokenPair.accessToken);
-        
+    async addToQueue(tokenPair : TokenPair, trackURI : string, refreshTokenOnFailure : boolean = true) {
+        logger.verbose("Request to add to Queue started.")
+        this.updateTokenIfExpiringSoon(tokenPair).then(token => {
+            let options = this.createPostSongOptions(trackURI, token.accessToken);
             request(options, (res) => {
                 res.on("end", () => {
-                    if (res.statusCode !== 304)
+                    if (res.statusCode !== 304) {
+                        logger.debug("Add to queue request failed with code " + res.statusCode);
                         throw new Error("Status Code not 304");
+                    }
                 })
             }).end();
         }).catch(err => {
+            if (refreshTokenOnFailure) {
+                logger.verbose("Attempting to refresh token after addToQueue api failure.")
+                this.updateToken(tokenPair).then(newToken => {
+                    this.addToQueue(newToken, trackURI, false)
+                }).catch(err => {throw err});
+            }
             throw err;
         })
     }
-    
-    async refreshTokenIfExpiringSoon(tokenPair : TokenPair) : Promise<TokenPair> {
+
+    async updateTokenIfExpiringSoon(tokenPair : TokenPair) : Promise<TokenPair> {
+        let now = new Date();
+        if ((tokenPair.expirationTime.getTime() - now.getTime()) / 1000 < this.minimumTokenTimeRemaining) {
+            return this.updateToken(tokenPair);
+        }
+        return tokenPair;
+    }
+
+    async updateToken(tokenPair : TokenPair) : Promise<TokenPair> {
+        logger.debug("Attempting to update token.")
+        let newToken = await this.fetchTokenFromRefresh(tokenPair)
+        await this.repository.replaceTokens(tokenPair, newToken);
+        return newToken;
+    }
+
+    async updateTokenPairFromRequestId(requestId : string) {
+        logger.verbose("Attempting to fetch token pair from code");
+        let code = await this.repository.getRequestCodeById(requestId);
+        let tokenPair = await this.fetchTokenFromCode(code);
+        this.repository.finishCodeRequest(requestId, tokenPair);
+    }
+
+    private fetchTokenFromRefresh(tokenPair : TokenPair) : Promise<TokenPair> {
+        logger.verbose("Attempting to fetch token pair from refresh token")
+        let options = this.createRefreshTokenOptions();
+        let body = `{'grant_type' : 'refresh_token', 'refresh_token':'${tokenPair.refreshToken}', 'redirect_uri':'${this.redirectUri}'}`;
+        return this.fetchTokenPair(options, body);
+    }
+
+    private fetchTokenFromCode(code : string) : Promise<TokenPair> {
+        let options = this.createFetchFromCodeOptions();
+        let body = `{'grant_type' : 'authorization_code', 'code' : '${code}', 'redirect_uri':'${this.redirectUri}'}`
+        return this.fetchTokenPair(options, body);
+    }
+
+    private fetchTokenPair(requestOptions : RequestOptions, body : string) : Promise<TokenPair>{
         return new Promise((resolve, reject) => {
-            let now = new Date();
-            if ((tokenPair.expirationTime.getTime() - now.getTime()) / 1000 < this.minimumTokenTimeRemaining) {
-                this.fetchTokenPair(tokenPair.refreshToken).then((result) => {
-                    resolve(result);
-                }).catch((err) => {
-                    reject(err);
-                })
-            }
-        });
-    }
-
-    async getTrackURIFromLink(link : string) : Promise<string> {
-        return new Promise((resolve, reject) => {
-            let splitAtSlash = link.split("/");
-            if (splitAtSlash[0].indexOf("link.tospotify.com") !== -1) {
-                request({
-                    hostname : "link.tospotify.com",
-                    port : 443,
-                    path : "/qZcPGKvChab",
-                    method : "GET",
-                }, (res) => {
-                    if (res.headers.location) {
-                        resolve(this.openSpotifyLinkToTrackURI(res.headers.location));
-                    } else {
-                        reject(new Error());
-                    }
-                }).end();
-            } else {
-                resolve(this.extractSpotifyURI(link));
-            }
-        })
-    }
-
-    openSpotifyLinkToTrackURI(link : string) : string {
-        let spotifyURI : string = link.slice(link.lastIndexOf("/") + 1 , link.indexOf("?"));
-        return spotifyURI;
-    }
-
-    isSpotifyURL(sharedLink : string) : boolean {
-        return this.checkForSpotifyURL(sharedLink) || this.checkForToSpotifyURL(sharedLink);
-    }
-
-    extractSpotifyURI(spotifyLink: string): string {
-        let searchString : string = "spotify:track:";
-        let spotifyURI : string = spotifyLink.slice(spotifyLink.indexOf(searchString) + searchString.length);
-
-        return spotifyURI;
-    }
-
-    checkForSpotifyURL(sharedLink : string): boolean{
-        let spotifyDomain : string = "spotify.com";
-        return sharedLink.includes(spotifyDomain);
-    }
-
-    checkForToSpotifyURL(sharedLink : string) : boolean {
-        let spotifyDomain : string = "tospotify.com";
-        return sharedLink.includes(spotifyDomain);
-    }
-
-    async fetchTokenPair(code : string) : Promise<TokenPair> {
-        return new Promise((resolve, reject) => {
-            let options = this.createTokenFetchOptions();
             let data = ""
-
-            request(options, (res) => {
+            logger.debug("Making spotify api request:\nBody: " + body + "\nOptions: " + JSON.stringify(requestOptions))
+            request(requestOptions, (res) => {
                 res.on('data', (chunk) => {
                     data += chunk;
                 });
@@ -129,17 +105,33 @@ export class SpotifyAPI {
                 res.on('error', (err) => {
                     reject(err);
                 })
-            }).end(`{'grant_type' : 'authorization_code', 'code':${code}, 'redirect_uri':'${this.redirectUri}'}`);
+            }).end(body);
         })
     }
 
-    private createTokenFetchOptions() {
+    private createFetchFromCodeOptions() {
         return {
             hostname : "accounts.spotify.com",
             auth : `${this.clientId}:${this.clientSecret}`,
             port : 443,
             path : "/api/token",
             method : "POST",
+            headers : {
+                "Accept" : "Application/json",
+            }
+        }
+    }
+
+    private createRefreshTokenOptions() {
+        return {
+            hostname : "accounts.spotify.com",
+            auth : `${this.clientId}:${this.clientSecret}`,
+            port : 443,
+            path : "/api/token",
+            method : "POST",
+            headers : {
+                "Accept" : "Application/json",
+            }
         }
     }
 
@@ -150,7 +142,7 @@ export class SpotifyAPI {
             path : `/v1/me/player/queue?uri=${trackURI}`,
             method : "POST",
             headers : {
-                "Authorization" : `Bearer ${access_token}`
+                "Authorization" : `Bearer ${access_token}`,
             }
         }
     }
@@ -159,17 +151,11 @@ export class SpotifyAPI {
         let responseObject = JSON.parse(response);
         
         if (!responseObject.access_token || !responseObject.token_type || !responseObject.scope || !responseObject.expires_in || !responseObject.refresh_token)
-        throw new Error("Not all information received");
+            throw new Error("Not all information received");
         
         let now = new Date();
         let expiration = new Date((new Date()).setSeconds(now.getSeconds() + parseInt(responseObject.expires_in)));
         
         return new TokenPair(responseObject.access_token, responseObject.refresh_token, expiration);
-    }
-
-    private createBase64AuthHeader() {
-        const content = `${this.clientId}:${this.clientSecret}`;
-        const buffer = Buffer.from(content, "utf-8");
-        return "Basic " + buffer.toString("base64");
     }
 }

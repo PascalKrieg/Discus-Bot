@@ -2,7 +2,9 @@
 services:
   bot:
     build: ./bot
-    env_file: bot-environment.env
+    env_file:
+      - bot-environment.env
+      - mariadb-environment.env
   
   registration:
     build: ./registration

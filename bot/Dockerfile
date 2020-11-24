@@ -4,6 +4,7 @@
 # dockerfile
 # the first image use node image as the builder because it has git program
 FROM node:12 as builder
+LABEL builder=true
 
 WORKDIR /app
 

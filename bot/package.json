@@ -22,7 +22,8 @@
     "discord.js": "^12.3.1",
     "inversify": "^5.0.1",
     "mariadb": "^2.5.1",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/node": "^14.11.1",

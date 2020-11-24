@@ -1,7 +1,6 @@
 
 const TYPES = {
-    Repository : Symbol.for("Repository"),
-    DbAccess : Symbol.for("DbAccess")
+    Repository : Symbol.for("Repository")
 }
 
 export { TYPES };

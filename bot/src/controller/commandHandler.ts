@@ -4,46 +4,54 @@ import { CreatePartyCommand } from "../model/commands/createPartyCommand"
 import { RegisterMeCommand } from "../model/commands/registerMeCommand";
 import { Repository } from "../model/data/repository";
 import { SpotifyAPI } from "../model/spotifyApi";
+import { getTrackURIFromLink,  isSpotifyURL} from "../model/spotifyLinkUtil"
 
+import * as Logging  from '../logging';
 
 export class CommandHandler {
     readonly commandPrefix = "$";
     repository : Repository;
     spotifyApi : SpotifyAPI;
-
+    logger = Logging.buildLogger("httpsController");
 
     constructor(repository : Repository, spotifyApi : SpotifyAPI) {
         this.repository = repository;
         this.spotifyApi = spotifyApi;
     }
 
-    handleCommand(message : Message) {
-        if (this.isMessageBotCommand(message)) {
-            this.handleBotCommand(message);
-        }
-
-        if(this.repository.isChannelPartyChannel(message.channel.id)){
-            this.handlePartyChannelCommand(message);
-            return;
+    handleCommand = async (message : Message) => {
+        try {
+            if (this.isMessageBotCommand(message)) {
+                this.handleBotCommand(message);
+                if(await this.repository.isChannelPartyChannel(message.channel.id)){
+                    this.handlePartyChannelCommand(message);
+                }
+            }
+        } catch(err) {
+            this.logger.error(err);
         }
     }
 
-    handlePartyChannelCommand(message: Message) {
-        let owner = this.repository.getPartyChannelOwner(message.channel.id);
+    isMessageBotCommand(message : Message) : boolean{
+        return message.channel.type == "text" && message.content.slice(0, this.commandPrefix.length) == this.commandPrefix;
+    }
+
+    async handlePartyChannelCommand(message: Message) {
+        let owner = await this.repository.getPartyChannelOwner(message.channel.id);
         let commandParts = this.seperateCommandParts(message.content);
-        let urls = commandParts.parameters.filter((value) => this.spotifyApi.isSpotifyURL(value));
+        let urls = commandParts.parameters.filter((value) => isSpotifyURL(value));
         if (urls.length == 0)
             return;
 
-        this.spotifyApi.getTrackURIFromLink(urls[0]).then(trackURI => {
-            this.spotifyApi.addToQueue(owner.userId, trackURI);
+        getTrackURIFromLink(urls[0]).then(trackURI => {
+            this.spotifyApi.addToQueue(owner.tokenPair, trackURI);
         });
     }
 
     handleBotCommand(message : Message) {
         try {
             let commandParts = this.seperateCommandParts(message.content);
-    
+            this.logger.debug(message.author.tag + " typed command: " + commandParts.command)
             let instance : Command;
             switch(commandParts.command) {
                 case "createparty":
@@ -54,14 +62,13 @@ export class CommandHandler {
                     instance = new RegisterMeCommand(message, this.repository, this.spotifyApi);
                     instance.execute();
                     break;
+                case "testdb":
+                    this.repository.getPartyChannelIds();
+                    break;
             }
         } catch (err) {
             console.error(err);
         }
-    }
-
-    isMessageBotCommand(message : Message) : boolean {
-        return message.channel.type == "text" && message.content.slice(0, this.commandPrefix.length - 1) == this.commandPrefix;
     }
 
     seperateCommandParts(fullComandString : String) {
