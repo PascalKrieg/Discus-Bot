@@ -31,5 +31,5 @@ To start the bot, execute ```docker-compose up --build``` in the root directory 
 Command             | Parameters | Description
 ---------------     | ---------- | ------------
 $registerMe         | *none*     | Sends a registration link to the user typing the command. If clicked on, the user tokens will be added to the database.
-$createParty        | @user      | Creates a listening party that controlls the spotify queue of the command issuer.
+$createParty        | Discord mentions (@user list)      | Creates a listening party that controlls the spotify queue of the command issuer.
 Songlink            | *none*     | If sent in a party channel, the song will be added to the playback queue of the channel owner. It doesn't matter, if there is other text in the message, as long as the link is clickable. This allows you to use the Spotify share option on mobile.
