@@ -20,7 +20,7 @@ export class RepositoryImpl implements Repository {
                 user: process.env.MYSQL_USER,
                 password: process.env.MYSQL_PASSWORD,
                 connectionLimit: 5,
-                database: "playback_enq",
+                database: process.env.MYSQL_DATABASE,
                 bigNumberStrings : true
             })
             return this.pool;
