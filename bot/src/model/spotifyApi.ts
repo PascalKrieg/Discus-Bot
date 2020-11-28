@@ -153,7 +153,7 @@ export class SpotifyAPI {
         }
     }
 
-    createTokenPairFromResponse(response : string) : TokenPair {
+    private createTokenPairFromResponse(response : string) : TokenPair {
         let responseObject = JSON.parse(response);
         
         if (!responseObject.access_token || !responseObject.token_type || !responseObject.scope || !responseObject.expires_in || !responseObject.refresh_token)
