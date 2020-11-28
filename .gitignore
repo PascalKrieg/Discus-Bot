@@ -119,3 +119,6 @@ dist
 
 # Docker environment file
 *.env
+
+# database data
+dbData/
