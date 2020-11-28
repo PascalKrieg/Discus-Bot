@@ -1,10 +1,10 @@
 import { createLogger, format, transports, Logger } from "winston";
-import winston from "winston/lib/winston/config";
 const { combine, label, timestamp, printf } = format;
 
 
 const myFormat = printf(( {level, message, label, timestamp} ) => {
-    return `${timestamp} [${label}] ${level}: ${message}`;
+    let formattedLevel = level[0].toUpperCase() + level.substr(1, level.length - 1);
+    return `${timestamp} [${formattedLevel}] ${label}: ${message}`;
 })
 
 export function buildLogger(displayLabel : string) : Logger{

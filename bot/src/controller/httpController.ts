@@ -1,4 +1,4 @@
-import http from 'http'
+import http, { ServerResponse } from 'http'
 import { Repository } from '../model/data/repository';
 import { SpotifyAPI } from '../model/spotifyApi';
 
@@ -14,18 +14,25 @@ export function setDependencies(repository : Repository, spotifyAPI : SpotifyAPI
     spotify = spotifyAPI;
 }
 
-function requestListener(req : any, res : any) {
+function requestListener(req : any, res : ServerResponse) {
     logger.verbose("Received registration completion request: " + req.url)
     let queryObject = extractQuery(req.url);
 
     let requestId = queryObject.get("requestId");
     logger.debug("Extracted request id: " + requestId);
     if (requestId) {
-        logger.debug("trying to update token for")
-        spotify.updateTokenPairFromRequestId(requestId);
+        logger.debug("trying to update token for request id: " + requestId)
+        spotify.updateTokenPairFromRequestId(requestId).then( () => {
+                res.statusCode = 200;
+                res.end()
+            }).catch((err) => {
+                logger.error("Could not update token for request id: " + requestId);
+                logger.error(err);
+                res.statusCode = 500;
+                res.end()
+            });
     }
-
-    res.end();
+    
 }
 
 function extractQuery(url : string) : Map<string, string> {

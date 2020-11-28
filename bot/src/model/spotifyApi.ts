@@ -6,6 +6,7 @@ let logger = Logging.buildLogger("spotifyApi");
 
 export class SpotifyAPI {
     readonly minimumTokenTimeRemaining = 60;
+    readonly spotifyApiHostname = ""
 
     clientId : string;
     clientSecret : string;
@@ -66,21 +67,26 @@ export class SpotifyAPI {
 
     async updateTokenPairFromRequestId(requestId : string) {
         logger.verbose("Attempting to fetch token pair from code");
-        let code = await this.repository.getRequestCodeById(requestId);
-        let tokenPair = await this.fetchTokenFromCode(code);
-        this.repository.finishCodeRequest(requestId, tokenPair);
+        try {
+            let code = await this.repository.getRequestCodeById(requestId);
+            let tokenPair = await this.fetchTokenFromCode(code);
+            this.repository.finishCodeRequest(requestId, tokenPair);
+        } catch (err) {
+            logger.error("Error while attempting to fetch token pair from code (requestId: " + requestId + ")");
+            throw err;
+        }
     }
 
     private fetchTokenFromRefresh(tokenPair : TokenPair) : Promise<TokenPair> {
         logger.verbose("Attempting to fetch token pair from refresh token")
         let options = this.createRefreshTokenOptions();
-        let body = `{'grant_type' : 'refresh_token', 'refresh_token':'${tokenPair.refreshToken}', 'redirect_uri':'${this.redirectUri}'}`;
+        let body = `{'grant_type' : 'refresh_token', 'refresh_token':'${tokenPair.refreshToken}', 'redirect_uri':'${encodeURIComponent(this.redirectUri)}', 'client_id:${this.clientId}, 'client_secret:${this.clientSecret}'}`;
         return this.fetchTokenPair(options, body);
     }
 
     private fetchTokenFromCode(code : string) : Promise<TokenPair> {
         let options = this.createFetchFromCodeOptions();
-        let body = `{'grant_type' : 'authorization_code', 'code' : '${code}', 'redirect_uri':'${this.redirectUri}'}`
+        let body = `{'grant_type' : 'authorization_code', 'code' : '${code}', 'redirect_uri':' ${ encodeURIComponent(this.redirectUri)}, 'client_id:${this.clientId}, 'client_secret:${this.clientSecret}'}`
         return this.fetchTokenPair(options, body);
     }
 
@@ -112,7 +118,7 @@ export class SpotifyAPI {
     private createFetchFromCodeOptions() {
         return {
             hostname : "accounts.spotify.com",
-            auth : `${this.clientId}:${this.clientSecret}`,
+            //auth : `${this.clientId}:${this.clientSecret}`,
             port : 443,
             path : "/api/token",
             method : "POST",
@@ -125,7 +131,7 @@ export class SpotifyAPI {
     private createRefreshTokenOptions() {
         return {
             hostname : "accounts.spotify.com",
-            auth : `${this.clientId}:${this.clientSecret}`,
+            //auth : `${this.clientId}:${this.clientSecret}`,
             port : 443,
             path : "/api/token",
             method : "POST",

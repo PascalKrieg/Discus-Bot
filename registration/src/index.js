@@ -14,18 +14,34 @@ app.get("/register", async (req, res) => {
     
         console.log(id)
     
-        http.request({
+        let updateRequest = http.request({
             hostname : "bot",
             port : 8080,
             path: `/?requestId=${id}`,
             method: "POST",
-        }, res => {}).end();
+        }, res => {
+        })
     
-        res.send("Erfolgreich eingeloggt.");
+        updateRequest.on("response", (response) => {
+            if (response.statusCode == 200) {
+                res.send("Erfolgreich eingeloggt.");
+            } else {
+                res.send("Etwas ist schief gelaufen! Status: " + response.statusCode + " " + response.statusMessage);
+            }
+        })
+        updateRequest.end();
     } catch (err) {
-        res.send("Etwas ist schief gelaufen!")
+        res.send("Etwas ist schief gelaufen! \n" + err);
     }
     
 });
+
+app.post("/*", (req, res) => {
+    console.log("Headers:")
+    console.log(req.headers)
+    console.log("body:")
+    console.log(req.body)
+})
+
 
 app.listen(9897);
