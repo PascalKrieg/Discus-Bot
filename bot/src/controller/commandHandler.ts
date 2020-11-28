@@ -7,12 +7,14 @@ import { SpotifyAPI } from "../model/spotifyApi";
 import { getTrackURIFromLink,  isSpotifyURL} from "../model/spotifyLinkUtil"
 
 import * as Logging  from '../logging';
+import { url } from "inspector";
 
 export class CommandHandler {
     readonly commandPrefix = "$";
+    readonly ignorePrefix = "//"
     repository : Repository;
     spotifyApi : SpotifyAPI;
-    logger = Logging.buildLogger("httpsController");
+    logger = Logging.buildLogger("commandHandler");
 
     constructor(repository : Repository, spotifyApi : SpotifyAPI) {
         this.repository = repository;
@@ -20,12 +22,19 @@ export class CommandHandler {
     }
 
     handleCommand = async (message : Message) => {
+        if (message.content.startsWith(this.ignorePrefix)) {
+            return;
+        }
+
+        this.logger.verbose("Read message in channel " + message.channel.id);
         try {
+            if(await this.repository.isChannelPartyChannel(message.channel.id)){
+                this.logger.verbose("Handling party channel message: " + message.content);
+                this.handlePartyChannelCommand(message);
+            }
             if (this.isMessageBotCommand(message)) {
                 this.handleBotCommand(message);
-                if(await this.repository.isChannelPartyChannel(message.channel.id)){
-                    this.handlePartyChannelCommand(message);
-                }
+                
             }
         } catch(err) {
             this.logger.error(err);
@@ -37,15 +46,25 @@ export class CommandHandler {
     }
 
     async handlePartyChannelCommand(message: Message) {
-        let owner = await this.repository.getPartyChannelOwner(message.channel.id);
-        let commandParts = this.seperateCommandParts(message.content);
-        let urls = commandParts.parameters.filter((value) => isSpotifyURL(value));
-        if (urls.length == 0)
-            return;
+        try {
+            let owner = await this.repository.getPartyChannelOwner(message.channel.id);
 
-        getTrackURIFromLink(urls[0]).then(trackURI => {
-            this.spotifyApi.addToQueue(owner.tokenPair, trackURI);
-        });
+            let urls = message.content.split(" ").filter((value) => isSpotifyURL(value));
+            
+            if (urls.length == 0) {
+                this.logger.verbose("No URLs found in party channel message");
+                return
+            }
+
+            let trackURI = await getTrackURIFromLink(urls[0]);
+            this.logger.debug(`trackURI ${trackURI} extracted`);
+            this.logger.debug("Attempting to use token with expiration time " + owner.tokenPair.expirationTime)
+            await this.spotifyApi.addToQueue(owner.tokenPair, trackURI);
+        } catch(err) {
+            this.logger.error(err)
+            message.channel.send("// Failed to add song. " + err.message);
+            throw err;
+        }
     }
 
     handleBotCommand(message : Message) {
@@ -67,7 +86,8 @@ export class CommandHandler {
                     break;
             }
         } catch (err) {
-            console.error(err);
+            this.logger.error(err)
+            throw err;
         }
     }
 

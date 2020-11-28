@@ -1,20 +1,18 @@
 import { Channel, Guild, GuildCreateChannelOptions, Message, MessageMentions, OverwriteData, User } from "discord.js";
 import { Repository } from "../data/repository";
 
+import * as Logging from "../../logging"
+let logger = Logging.buildLogger("createPartyCommand");
 
 export class CreatePartyCommand {
 
-    guild : Guild;
-    creator : User;
+    message : Message;
     mentions : User[];
     partyChannel : Channel|undefined = undefined;
     repository : Repository;
 
     constructor(message : Message, repository : Repository) {
-        if (!message.guild)
-            throw new Error();
-        this.guild = message.guild;
-        this.creator = message.author;
+        this.message = message;
         this.mentions = this.extractUsers(message.mentions);
         this.repository = repository;
     }
@@ -25,19 +23,27 @@ export class CreatePartyCommand {
 
     private async setupPartyChannel(){
         let channelName = this.createChannelName();
+        logger.debug("Attempting to setup party channel " + channelName)
         let options = this.createOptionsObject();
-        this.partyChannel = await this.guild.channels.create(channelName, options);
-        this.repository.addPartyChannel(this.partyChannel, this.creator);
+        if (this.message.guild == null) {
+            return;
+        }
+        try {
+            this.partyChannel = await this.message.guild.channels.create(channelName, options);
+            this.repository.addPartyChannel(this.partyChannel, this.message.author);
+        } catch(err) {
+            this.printErrorMessage(err);
+        }
     }
 
     private extractUsers(mentions : MessageMentions) : User[] {
         let users : User[] = Array.from(mentions.users.values());
-        users.push(this.creator);
+        users.push(this.message.author);
         return users;
     }
 
     private createChannelName() {
-        let authorName = this.creator.tag.split("#")[0].toLowerCase();
+        let authorName = this.message.author.tag.split("#")[0].toLowerCase();
         let date = new Date();
         let channelName = `${authorName}-${date.getDate()}-${date.getMonth() + 1}`;
         return channelName;
@@ -73,6 +79,10 @@ export class CreatePartyCommand {
             type : "member"
         };
         return overwrite;
+    }
+
+    private printErrorMessage(err : Error) {
+        this.message.channel.send("Failed to create party channel.\n" + err.message);
     }
 
 }

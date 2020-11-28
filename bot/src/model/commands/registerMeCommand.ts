@@ -2,7 +2,7 @@ import { Message } from "discord.js";
 import { Repository } from "../data/repository";
 import { SpotifyAPI } from "../spotifyApi";
 import { Command } from "./command";
-
+import * as crypto from "crypto";
 
 export class RegisterMeCommand implements Command {
     message : Message;
@@ -27,8 +27,7 @@ export class RegisterMeCommand implements Command {
     }
 
     private produceState() : string {
-        let now = new Date();
-        let state = this.message.author.tag + "#" + now.getTime();
+        let state = crypto.randomBytes(8).toString('hex');
         return state;
     }
 }

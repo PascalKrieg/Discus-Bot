@@ -8,8 +8,9 @@ const myFormat = printf(( {level, message, label, timestamp} ) => {
 })
 
 export function buildLogger(displayLabel : string) : Logger{
+    let loglevel = process.env.LOGLEVEL ? process.env.LOGLEVEL : 'info'
     return createLogger({
-        level: 'debug',
+        level: loglevel,
         format: combine(
             label({ label: displayLabel }),
             timestamp(),

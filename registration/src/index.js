@@ -24,7 +24,7 @@ app.get("/register", async (req, res) => {
     
         updateRequest.on("response", (response) => {
             if (response.statusCode == 200) {
-                res.send("Erfolgreich eingeloggt.");
+                res.send("Erfolgreich eingeloggt. <script>setTimeout(close, 3000) </script>");
             } else {
                 res.send("Etwas ist schief gelaufen! Status: " + response.statusCode + " " + response.statusMessage);
             }

@@ -20,7 +20,8 @@ export class RepositoryImpl implements Repository {
                 user: process.env.MYSQL_USER,
                 password: process.env.MYSQL_PASSWORD,
                 connectionLimit: 5,
-                database: "playback_enq"
+                database: "playback_enq",
+                bigNumberStrings : true
             })
             return this.pool;
         } else {
@@ -53,7 +54,12 @@ export class RepositoryImpl implements Repository {
         let conn;
         try {
             conn = await this.getPool().getConnection();
-            await conn.query("INSERT INTO party_channels VALUES (?, ?, ?)", [channel.id, owner.id, autoDelete]);
+
+            if (autoDelete) {
+                await conn.query("INSERT INTO party_channels VALUES (?, ?, ?)", [channel.id, owner.id, autoDelete]);
+            } else {
+                await conn.query("INSERT INTO party_channels VALUES (?, ?, NULL)", [channel.id, owner.id]);
+            }
             logger.debug(`Successfully added party channel ${channel.id} by ${owner.tag}`)
         } catch(err) {
             logger.error(err)
@@ -83,7 +89,7 @@ export class RepositoryImpl implements Repository {
         let conn;
         try {
             conn = await this.getPool().getConnection();
-            let rows : any[] = await conn.query("SELECT * FROM discord_users WHERE id IN (SELECT id FROM party_channels WHERE party_channels.id = ?)", [channelId]);
+            let rows : any[] = await conn.query("SELECT * FROM discord_users WHERE id IN (SELECT owner_id FROM party_channels WHERE id = ?)", [channelId]);
             if (rows.length === 0) {
                 throw new Error("Channel not found");
             }
@@ -171,7 +177,7 @@ export class RepositoryImpl implements Repository {
         let conn;
         try {
             conn = await this.getPool().getConnection();
-            let result = await conn.query("UPDATE discord_users" + 
+            let result = await conn.query("UPDATE discord_users " + 
                 "SET access_token = ?, refresh_token = ?, token_expiration = ? " + 
                 "WHERE access_token=? AND refresh_token=?", 
                 [oldToken.accessToken, oldToken.refreshToken, oldToken.expirationTime, newToken.accessToken, newToken.refreshToken]);
@@ -330,11 +336,18 @@ export class RepositoryImpl implements Repository {
         try {
             conn = await this.getPool().getConnection();
             await conn.beginTransaction();
-            let userId = await conn.query("SELECT discord_user FROM code_requests WHERE request_id = ?", [requestId])
+            let idResult = await conn.query("SELECT discord_user FROM code_requests WHERE request_id = ?", [requestId]);
+            let userId = idResult[0].discord_user;
             if (userId.length == 0) {
                 throw new Error("Not Found");
             }
-            await conn.query("UPDATE discord_users SET access_token = ?, refresh_token = ?, token_expiration = ? WHERE id = ?", [newToken.accessToken, newToken.refreshToken, newToken.expirationTime, userId]);
+            logger.debug(`Code request with id ${requestId} belongs to user with user id ${userId}`);
+
+            let res = await conn.query("UPDATE discord_users SET access_token = ?, refresh_token = ?, token_expiration = ? WHERE id = ?", [newToken.accessToken, newToken.refreshToken, newToken.expirationTime, userId]);
+            if (res.affectedRows === 0) {
+                logger.error("Update of token pair affected 0 rows!");
+            }
+
             await conn.query("DELETE FROM code_requests WHERE request_id = ?", [requestId]);
             logger.debug(`Successfully finished code request with id ${requestId} and deleted it.`)
             await conn.commit();

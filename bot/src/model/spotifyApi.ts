@@ -28,31 +28,35 @@ export class SpotifyAPI {
     }
 
     async addToQueue(tokenPair : TokenPair, trackURI : string, refreshTokenOnFailure : boolean = true) {
-        logger.verbose("Request to add to Queue started.")
-        this.updateTokenIfExpiringSoon(tokenPair).then(token => {
+        try {
+            logger.verbose("Request to add to Queue started.")
+            let token = await this.updateTokenIfExpiringSoon(tokenPair);
             let options = this.createPostSongOptions(trackURI, token.accessToken);
+            
             request(options, (res) => {
                 res.on("end", () => {
                     if (res.statusCode !== 304) {
                         logger.debug("Add to queue request failed with code " + res.statusCode);
                         throw new Error("Status Code not 304");
+                    } else {
+                        logger.debug("Add to queue request finished with code " + res.statusCode);
                     }
                 })
             }).end();
-        }).catch(err => {
+        } catch(err) {
             if (refreshTokenOnFailure) {
                 logger.verbose("Attempting to refresh token after addToQueue api failure.")
-                this.updateToken(tokenPair).then(newToken => {
-                    this.addToQueue(newToken, trackURI, false)
-                }).catch(err => {throw err});
+                let newToken = await this.updateToken(tokenPair)
+                await this.addToQueue(newToken, trackURI, false)
             }
             throw err;
-        })
+        }
     }
 
     async updateTokenIfExpiringSoon(tokenPair : TokenPair) : Promise<TokenPair> {
         let now = new Date();
         if ((tokenPair.expirationTime.getTime() - now.getTime()) / 1000 < this.minimumTokenTimeRemaining) {
+            logger.verbose("Updated token as it was expiring soon or was already expired.");
             return this.updateToken(tokenPair);
         }
         return tokenPair;
@@ -70,6 +74,7 @@ export class SpotifyAPI {
         try {
             let code = await this.repository.getRequestCodeById(requestId);
             let tokenPair = await this.fetchTokenFromCode(code);
+            logger.debug("Fetched token pair with expiration time " + tokenPair.expirationTime)
             this.repository.finishCodeRequest(requestId, tokenPair);
         } catch (err) {
             logger.error("Error while attempting to fetch token pair from code (requestId: " + requestId + ")");
@@ -80,20 +85,20 @@ export class SpotifyAPI {
     private fetchTokenFromRefresh(tokenPair : TokenPair) : Promise<TokenPair> {
         logger.verbose("Attempting to fetch token pair from refresh token")
         let options = this.createRefreshTokenOptions();
-        let body = `{'grant_type' : 'refresh_token', 'refresh_token':'${tokenPair.refreshToken}', 'redirect_uri':'${encodeURIComponent(this.redirectUri)}', 'client_id:${this.clientId}, 'client_secret:${this.clientSecret}'}`;
-        return this.fetchTokenPair(options, body);
+        let body = `grant_type=refresh_token&refresh_token=${tokenPair.refreshToken}&redirect_uri=${encodeURIComponent(this.redirectUri)}&client_id=${this.clientId}&client_secret=${this.clientSecret}`;
+        return this.fetchTokenPair(options, body, tokenPair);
     }
 
     private fetchTokenFromCode(code : string) : Promise<TokenPair> {
         let options = this.createFetchFromCodeOptions();
-        let body = `{'grant_type' : 'authorization_code', 'code' : '${code}', 'redirect_uri':' ${ encodeURIComponent(this.redirectUri)}, 'client_id:${this.clientId}, 'client_secret:${this.clientSecret}'}`
+        let body = `grant_type=authorization_code&code=${code}&redirect_uri=${encodeURIComponent(this.redirectUri)}&client_id=${this.clientId}&client_secret=${this.clientSecret}`
         return this.fetchTokenPair(options, body);
     }
 
-    private fetchTokenPair(requestOptions : RequestOptions, body : string) : Promise<TokenPair>{
+    private fetchTokenPair(requestOptions : RequestOptions, body : string, oldToken? : TokenPair) : Promise<TokenPair>{
         return new Promise((resolve, reject) => {
             let data = ""
-            logger.debug("Making spotify api request:\nBody: " + body + "\nOptions: " + JSON.stringify(requestOptions))
+            logger.debug("Making spotify api token fetch request");
             request(requestOptions, (res) => {
                 res.on('data', (chunk) => {
                     data += chunk;
@@ -101,7 +106,7 @@ export class SpotifyAPI {
 
                 res.on('end', () => {
                     if (res.statusCode === 200) {
-                        let tokenPair = this.createTokenPairFromResponse(data);
+                        let tokenPair = this.createTokenPairFromResponse(data, oldToken);
                         resolve(tokenPair);
                     } else {
                         reject(new Error(data));
@@ -124,6 +129,7 @@ export class SpotifyAPI {
             method : "POST",
             headers : {
                 "Accept" : "Application/json",
+                "Content-Type" : "application/x-www-form-urlencoded"
             }
         }
     }
@@ -137,6 +143,7 @@ export class SpotifyAPI {
             method : "POST",
             headers : {
                 "Accept" : "Application/json",
+                "Content-Type" : "application/x-www-form-urlencoded"
             }
         }
     }
@@ -148,20 +155,22 @@ export class SpotifyAPI {
             path : `/v1/me/player/queue?uri=${trackURI}`,
             method : "POST",
             headers : {
-                "Authorization" : `Bearer ${access_token}`,
+                "Authorization" : `Bearer ${access_token}`
             }
         }
     }
 
-    private createTokenPairFromResponse(response : string) : TokenPair {
+    private createTokenPairFromResponse(response : string, oldTokenPair? : TokenPair) : TokenPair {
         let responseObject = JSON.parse(response);
         
-        if (!responseObject.access_token || !responseObject.token_type || !responseObject.scope || !responseObject.expires_in || !responseObject.refresh_token)
+        if (!responseObject.access_token || !responseObject.token_type || !responseObject.scope || !responseObject.expires_in)
             throw new Error("Not all information received");
         
         let now = new Date();
         let expiration = new Date((new Date()).setSeconds(now.getSeconds() + parseInt(responseObject.expires_in)));
         
-        return new TokenPair(responseObject.access_token, responseObject.refresh_token, expiration);
+        let refreshToken = responseObject.refresh_token ? responseObject.refresh_token : oldTokenPair?.refreshToken;
+
+        return new TokenPair(responseObject.access_token, refreshToken, expiration);
     }
 }

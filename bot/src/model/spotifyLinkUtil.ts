@@ -1,13 +1,35 @@
 import { request } from "https";
 
+import * as Logging from "../logging";
+let logger = Logging.buildLogger("spotifyLinkUtil");
+
 export async function getTrackURIFromLink(link : string) : Promise<string> {
+    logger.debug("Attempting to extract track uri from link: " + link);
+
+    if (isToSpotifyLink(link)) {
+        return await extractToSpotifyURI(link);
+    }
+
+    if (isSpotifyLink(link)) {
+        return await openSpotifyLinkToTrackURI(link);
+    }
+
+    throw new Error("Not a link");
+}
+
+export function isSpotifyURL(sharedLink : string) : boolean {
+    return isSpotifyLink(sharedLink) || isToSpotifyLink(sharedLink);
+}
+
+async function extractToSpotifyURI(link : string) : Promise<string> {
+    let targetPath = link.slice(link.lastIndexOf("/") + 1, link.length)
     return new Promise((resolve, reject) => {
         let splitAtSlash = link.split("/");
         if (splitAtSlash[0].indexOf("link.tospotify.com") !== -1) {
             request({
                 hostname : "link.tospotify.com",
                 port : 443,
-                path : "/qZcPGKvChab",
+                path : targetPath,
                 method : "GET",
             }, (res) => {
                 if (res.headers.location) {
@@ -17,25 +39,15 @@ export async function getTrackURIFromLink(link : string) : Promise<string> {
                 }
             }).end();
         } else {
-            resolve(extractSpotifyURI(link));
+            resolve(openSpotifyLinkToTrackURI(link));
         }
     })
 }
 
-export function isSpotifyURL(sharedLink : string) : boolean {
-    return isSpotifyLink(sharedLink) || isToSpotifyLink(sharedLink);
-}
 
 function openSpotifyLinkToTrackURI(link : string) : string {
     let spotifyURI : string = link.slice(link.lastIndexOf("/") + 1 , link.indexOf("?"));
-    return spotifyURI;
-}
-
-function extractSpotifyURI(spotifyLink: string): string {
-    let searchString : string = "spotify:track:";
-    let spotifyURI : string = spotifyLink.slice(spotifyLink.indexOf(searchString) + searchString.length);
-
-    return spotifyURI;
+    return "spotify:track:" + spotifyURI;
 }
 
 function isSpotifyLink(sharedLink : string): boolean{
@@ -44,6 +56,6 @@ function isSpotifyLink(sharedLink : string): boolean{
 }
 
 function isToSpotifyLink(sharedLink : string) : boolean {
-    let spotifyDomain : string = "tospotify.com";
+    let spotifyDomain : string = "link.tospotify.com";
     return sharedLink.includes(spotifyDomain);
 }
