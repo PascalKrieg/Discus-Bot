@@ -4,7 +4,7 @@ import * as Logging from "../logging";
 import { Repository } from "../model/data/repository";
 import { SpotifyAPI } from "../model/spotify/spotifyApi";
 import { CommandFactory } from "./commandFactory";
-import { Constructor, getCommandConstructors } from "./constructorRegistry";
+import { CommandConstructor, getCommandConstructors } from "./constructorRegistry";
 
 let logger = Logging.buildLogger("CommandFactoryImpl");
 
@@ -13,7 +13,7 @@ let logger = Logging.buildLogger("CommandFactoryImpl");
  * The list of available commands and the class constructors is taken from the command conctructor registry.
  */
 export class CommandFactoryImpl implements CommandFactory {
-    readonly commandMap : Map<string, Constructor<Command>> = new Map<string, Constructor<Command>>()
+    readonly commandMap : Map<string, CommandConstructor> = new Map<string, CommandConstructor>()
     readonly commandInfoMap : Map<string, CommandInfo> = new Map<string, CommandInfo>()
 
     repository : Repository;
@@ -57,7 +57,7 @@ export class CommandFactoryImpl implements CommandFactory {
         this.commandMap 
     }
 
-    private registerCommand(commandInfo : CommandInfo, ctor : Constructor<Command>) {
+    private registerCommand(commandInfo : CommandInfo, ctor : CommandConstructor) {
         let conflicts = this.getConflictingCommands(commandInfo);
             
         if (conflicts.length > 0) {
