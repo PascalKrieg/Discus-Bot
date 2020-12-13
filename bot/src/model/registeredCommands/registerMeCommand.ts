@@ -1,10 +1,11 @@
 import { Message } from "discord.js";
 import { Repository } from "../data/repository";
-import { SpotifyAPI } from "../spotifyApi";
-import { Command } from "./command";
+import { SpotifyAPI } from "../spotify/spotifyApi";
+import { CommandInfo, RegisteredCommand } from "../../commandFramework";
 import * as crypto from "crypto";
 
-export class RegisterMeCommand implements Command {
+@RegisteredCommand
+export class RegisterMeCommand {
     message : Message;
     repository : Repository;
     spotifyAPI : SpotifyAPI;
@@ -13,6 +14,14 @@ export class RegisterMeCommand implements Command {
         this.message = message;
         this.repository = repository;
         this.spotifyAPI = spotifyApi;
+    }
+
+    getCommandInfo(): CommandInfo {
+        return {
+            command : "registerMe",
+            aliases : [],
+            helpText : ""
+        }
     }
 
     async execute() {

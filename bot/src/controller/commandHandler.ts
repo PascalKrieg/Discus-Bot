@@ -1,22 +1,21 @@
 import { Message } from "discord.js";
-import { Command } from "../model/commands/command";
-import { CreatePartyCommand } from "../model/commands/createPartyCommand"
-import { RegisterMeCommand } from "../model/commands/registerMeCommand";
 import { Repository } from "../model/data/repository";
-import { SpotifyAPI } from "../model/spotifyApi";
+import { SpotifyAPI } from "../model/spotify/spotifyApi";
 import { getTrackURIFromLink,  isSpotifyURL} from "../model/spotifyLinkUtil"
 
 import * as Logging  from '../logging';
-import { url } from "inspector";
+import { CommandFactory } from "../commandFramework";
 
 export class CommandHandler {
     readonly commandPrefix = "$";
     readonly ignorePrefix = "//"
+    commandFactory : CommandFactory;
     repository : Repository;
     spotifyApi : SpotifyAPI;
     logger = Logging.buildLogger("commandHandler");
 
-    constructor(repository : Repository, spotifyApi : SpotifyAPI) {
+    constructor(commandFactory : CommandFactory, repository : Repository, spotifyApi : SpotifyAPI) {
+        this.commandFactory = commandFactory;
         this.repository = repository;
         this.spotifyApi = spotifyApi;
     }
@@ -71,20 +70,9 @@ export class CommandHandler {
         try {
             let commandParts = this.seperateCommandParts(message.content);
             this.logger.debug(message.author.tag + " typed command: " + commandParts.command)
-            let instance : Command;
-            switch(commandParts.command) {
-                case "createparty":
-                    instance = new CreatePartyCommand(message, this.repository);
-                    instance.execute();
-                    break;
-                case "registerme":
-                    instance = new RegisterMeCommand(message, this.repository, this.spotifyApi);
-                    instance.execute();
-                    break;
-                case "testdb":
-                    this.repository.getPartyChannelIds();
-                    break;
-            }
+
+            this.commandFactory.build(commandParts.command, message)?.execute()
+
         } catch (err) {
             this.logger.error(err)
             throw err;
@@ -101,4 +89,3 @@ export class CommandHandler {
     }
     
 }
-

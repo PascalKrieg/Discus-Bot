@@ -1,9 +1,11 @@
-import { Channel, Guild, GuildCreateChannelOptions, Message, MessageMentions, OverwriteData, User } from "discord.js";
+import { Channel, GuildCreateChannelOptions, Message, MessageMentions, OverwriteData, User } from "discord.js";
 import { Repository } from "../data/repository";
 
 import * as Logging from "../../logging"
+import { CommandInfo, RegisteredCommand } from "../../commandFramework";
 let logger = Logging.buildLogger("createPartyCommand");
 
+@RegisteredCommand
 export class CreatePartyCommand {
 
     message : Message;
@@ -15,6 +17,14 @@ export class CreatePartyCommand {
         this.message = message;
         this.mentions = this.extractUsers(message.mentions);
         this.repository = repository;
+    }
+
+    getCommandInfo(): CommandInfo {
+        return {
+            command : "createParty",
+            aliases : ["cp"],
+            helpText : ""
+        }
     }
 
     async execute() {

@@ -1,10 +1,11 @@
 import { request, RequestOptions } from "https";
-import { TokenPair } from "./data/tokenPair";
-import { Repository } from "./data/repository"
-import * as Logging from "../logging";
+import { TokenPair } from "../data/tokenPair";
+import { Repository } from "../data/repository"
+import * as Logging from "../../logging";
+import { SpotifyAPI } from "./spotifyApi";
 let logger = Logging.buildLogger("spotifyApi");
 
-export class SpotifyAPI {
+export class SpotifyAPIImpl implements SpotifyAPI{
     readonly minimumTokenTimeRemaining = 60;
     readonly spotifyApiHostname = ""
 
