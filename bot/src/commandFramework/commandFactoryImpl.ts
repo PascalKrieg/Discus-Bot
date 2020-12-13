@@ -8,6 +8,10 @@ import { Constructor, getCommandConstructors } from "./constructorRegistry";
 
 let logger = Logging.buildLogger("CommandFactoryImpl");
 
+/**
+ * Implementation of a command factory that creates command instances based on the command string and discord message received.
+ * The list of available commands and the class constructors is taken from the command conctructor registry.
+ */
 export class CommandFactoryImpl implements CommandFactory {
     readonly commandMap : Map<string, Constructor<Command>> = new Map<string, Constructor<Command>>()
     readonly commandInfoMap : Map<string, CommandInfo> = new Map<string, CommandInfo>()
@@ -15,6 +19,12 @@ export class CommandFactoryImpl implements CommandFactory {
     repository : Repository;
     spotifyApi : SpotifyAPI;
 
+    /**
+     * Constructs a new CommandFactory.
+     * This should probably not be called directly, as creation of this object should be handled by the dependency inversion framework.
+     * @param repository The repository used for persistance.
+     * @param spotifyApi The spotify API wrapper used.
+     */
     constructor(repository : Repository, spotifyApi : SpotifyAPI) {
         this.repository = repository;
         this.spotifyApi = spotifyApi;
