@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { Repository } from "../model/data/repository";
 import { SpotifyAPI } from "../model/spotify/spotifyApi";
-import { getTrackURIFromLink,  isSpotifyURL} from "../model/spotifyLinkUtil"
+import { getTrackURIFromLink,  isSpotifyURL} from "../model/spotify/spotifyLinkUtil"
 
 import * as Logging  from '../logging';
 import { CommandFactory } from "../commandFramework";

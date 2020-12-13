@@ -1,6 +1,6 @@
 import { request } from "https";
 
-import * as Logging from "../logging";
+import * as Logging from "../../logging";
 let logger = Logging.buildLogger("spotifyLinkUtil");
 
 export async function getTrackURIFromLink(link : string) : Promise<string> {
