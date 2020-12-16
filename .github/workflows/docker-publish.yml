@@ -101,3 +101,7 @@ jobs:
 
           docker tag $REIGSTRATION_IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
+          
+      - name: Delete builder images
+        run: |
+          docker system prune --filter label=stage=builder
