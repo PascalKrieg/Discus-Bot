@@ -54,7 +54,6 @@ export class CommandFactoryImpl implements CommandFactory {
             let commandInfo = ctor.prototype.getCommandInfo()
             this.registerCommand(commandInfo, ctor)
         }
-        this.commandMap 
     }
 
     private registerCommand(commandInfo : CommandInfo, ctor : CommandConstructor) {
