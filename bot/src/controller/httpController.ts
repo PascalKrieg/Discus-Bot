@@ -1,6 +1,6 @@
 import http, { ServerResponse } from 'http'
 import { Repository } from '../model/data/repository';
-import { SpotifyAPI } from '../model/spotifyApi';
+import { SpotifyAPI } from '../model/spotify/spotifyApi';
 
 import * as Logging  from '../logging';
 let logger = Logging.buildLogger("httpController");
