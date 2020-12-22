@@ -1,10 +1,12 @@
+import "reflect-metadata";
 import { Message } from "discord.js";
+import { inject, injectable } from "inversify";
 import {Command, CommandInfo} from "."
+import { TYPES } from "../dependencyInjection";
+import { PluginDependencies } from "../dependencyInjection/pluginDependencies";
 import * as Logging from "../logging";
-import { Repository } from "../model/data/repository";
-import { SpotifyAPI } from "../model/spotify/spotifyApi";
 import { CommandFactory } from "./commandFactory";
-import { CommandConstructor, getCommandConstructors } from "./constructorRegistry";
+import { CommandConstructor, getCommandConstructors } from "./pluginLoader";
 
 let logger = Logging.buildLogger("CommandFactoryImpl");
 
@@ -12,12 +14,10 @@ let logger = Logging.buildLogger("CommandFactoryImpl");
  * Implementation of a command factory that creates command instances based on the command string and discord message received.
  * The list of available commands and the class constructors is taken from the command conctructor registry.
  */
+@injectable()
 export class CommandFactoryImpl implements CommandFactory {
     readonly commandMap : Map<string, CommandConstructor> = new Map<string, CommandConstructor>()
     readonly commandInfoMap : Map<string, CommandInfo> = new Map<string, CommandInfo>()
-
-    repository : Repository;
-    spotifyApi : SpotifyAPI;
 
     /**
      * Constructs a new CommandFactory.
@@ -25,9 +25,7 @@ export class CommandFactoryImpl implements CommandFactory {
      * @param repository The repository used for persistance.
      * @param spotifyApi The spotify API wrapper used.
      */
-    constructor(repository : Repository, spotifyApi : SpotifyAPI) {
-        this.repository = repository;
-        this.spotifyApi = spotifyApi;
+    constructor() {
         this.registerAllCommands();
     }
 
@@ -35,12 +33,12 @@ export class CommandFactoryImpl implements CommandFactory {
         this.registerAllCommands();
     }
 
-    build(command : string, message : Message) : Command|undefined {
+    build(command : string, message : Message, dependencies : PluginDependencies) : Command|undefined {
         let lowerCaseCommand = command.toLowerCase();
         
         let ctor = this.commandMap.get(lowerCaseCommand);
         if (ctor) {
-            let command = new ctor(message, this.repository, this.spotifyApi);
+            let command = new ctor(message, dependencies.clone());
             return command;
         } else {
             return undefined;

@@ -1,8 +1,9 @@
 import { Channel, GuildCreateChannelOptions, Message, MessageMentions, OverwriteData, User } from "discord.js";
-import { Repository } from "../data/repository";
+import { Repository } from "../../data/repository";
 
-import * as Logging from "../../logging"
-import { CommandInfo, RegisteredCommand } from "../../commandFramework";
+import * as Logging from "../../../logging"
+import { CommandInfo, RegisteredCommand } from "../../../commandFramework";
+import { PluginDependencies } from "../../../dependencyInjection";
 let logger = Logging.buildLogger("createPartyCommand");
 
 @RegisteredCommand
@@ -13,10 +14,10 @@ export class CreatePartyCommand {
     partyChannel : Channel|undefined = undefined;
     repository : Repository;
 
-    constructor(message : Message, repository : Repository) {
+    constructor(message : Message, dependencies : PluginDependencies) {
         this.message = message;
         this.mentions = this.extractUsers(message.mentions);
-        this.repository = repository;
+        this.repository = dependencies.repository;
     }
 
     getCommandInfo(): CommandInfo {

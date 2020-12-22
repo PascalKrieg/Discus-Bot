@@ -1,4 +1,4 @@
-import { TokenPair } from "../data/tokenPair";
+import { TokenPair } from "../../data/tokenPair";
 
 export interface SpotifyAPI {
     getRegisterUrl(state : string) : string

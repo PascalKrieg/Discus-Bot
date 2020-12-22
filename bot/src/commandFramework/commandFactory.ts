@@ -1,4 +1,5 @@
 import { Message } from "discord.js";
+import { PluginDependencies } from "../dependencyInjection";
 import { Command } from "./interfaces";
 
 /**
@@ -11,5 +12,5 @@ export interface CommandFactory {
      * @param message The discord message object created when receiving the command message.
      * @returns Returns the command instance, if the command issued by the users exists, undefined otherwise.
      */
-    build(command : string, message : Message) : Command|undefined
+    build(command : string, message : Message, dependencies : PluginDependencies) : Command|undefined
 }

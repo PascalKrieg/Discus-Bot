@@ -1,8 +1,9 @@
 import { Message } from "discord.js";
-import { Repository } from "../data/repository";
-import { SpotifyAPI } from "../spotify/spotifyApi";
-import { CommandInfo, RegisteredCommand } from "../../commandFramework";
+import { Repository } from "../../data/repository";
+import { SpotifyAPI } from "../../pluginDependencies/spotify/spotifyApi";
+import { CommandInfo, RegisteredCommand } from "../../../commandFramework";
 import * as crypto from "crypto";
+import { PluginDependencies } from "../../../dependencyInjection";
 
 @RegisteredCommand
 export class RegisterMeCommand {
@@ -10,10 +11,10 @@ export class RegisterMeCommand {
     repository : Repository;
     spotifyAPI : SpotifyAPI;
 
-    constructor(message : Message, repository : Repository, spotifyApi : SpotifyAPI) {
+    constructor(message : Message, dependencies : PluginDependencies) {
         this.message = message;
-        this.repository = repository;
-        this.spotifyAPI = spotifyApi;
+        this.repository = dependencies.repository;
+        this.spotifyAPI = dependencies.spotifyApi;
     }
 
     getCommandInfo(): CommandInfo {
