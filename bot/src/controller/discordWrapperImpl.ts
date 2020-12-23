@@ -33,11 +33,11 @@ export class DiscordWrapperImpl implements DiscordWrapper {
         let eventActionConstructors = getEventActionConstructors();
         eventActionConstructors.forEach((ctor : EventActionConstructor) => {
             let eventString = ctor.prototype.GetEventString();
-            let callback = (...args : any) => {
+            let callback = (...args : any[]) => {
                 logger.verbose("Callback called for " + ctor.name)
                 try {
                     let eventAction = new ctor(this.dependencies.clone());
-                    eventAction.action(args);
+                    eventAction.passArguments(args);
                     
                 } catch (error) {
                     logger.error(`Error occured during action execution of action ${ctor.name}\n${error}`);
@@ -55,7 +55,8 @@ export class DiscordWrapperImpl implements DiscordWrapper {
         });
         this.client.on('error', (error) => {
             logger.error(error);
-        })
+        });
+        this.client.on('messageReactionAdd', () => {logger.info("Reaction added")})
         this.registerEventActions();
 
         this.client.login(process.env.DISCORD_TOKEN);

@@ -6,7 +6,7 @@ export class MessageCommandAction extends EventActions.MessageAction {
     readonly commandPrefix = "$";
     readonly ignorePrefix = "//"
 
-    action(message?: Message): void {
+    action(message : Message): void {
         this.logger.info("Received message event")
         if (!message)
             return;

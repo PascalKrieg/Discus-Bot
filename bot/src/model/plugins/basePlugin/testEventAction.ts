@@ -11,11 +11,3 @@ export class TestEventAction extends EventActions.ChannelCreateAction {
         }
     }
 }
-
-@RegisteredEventAction
-export class TestEventAction2 extends EventActions.ChannelPinsUpdateAction {
-    action(channel: DMChannel | GuildChannel, time: Date): void {
-        console.log("testeventaction 2")
-    }
-
-}

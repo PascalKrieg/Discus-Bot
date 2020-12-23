@@ -10,8 +10,9 @@ export abstract class EventAction {
         this.logger = buildLogger(this.GetEventString())
         this.dependencies = dependencies;
     }
-    abstract GetEventString() : string
-    abstract action(...args: any) : void
+    abstract GetEventString() : string;
+    abstract action(...args: any[]) : void;
+    abstract passArguments(...args: any[]) : void;
 }
 
 export abstract class ChannelCreateAction extends EventAction {
@@ -23,6 +24,10 @@ export abstract class ChannelCreateAction extends EventAction {
      * @param channel The channel that was created
      */
     abstract action(channel :  DMChannel|GuildChannel) : void
+
+    passArguments(...args: any[]) {
+        this.action(args[0]);
+    }
 }
 
 export abstract class ChannelDeleteAction extends EventAction {
@@ -260,7 +265,15 @@ export abstract class MessageAction extends EventAction {
      * Emitted whenever a message is created.
      * @param message The created message
      */
-    abstract action(message? : Message) : void
+    abstract action(message : Message) : void
+
+    passArguments(...args: any[]) {
+        this.logger.debug("PASSING ARGUMENTS:");
+        let [message] = args;
+        Object.keys(message[0]).forEach(key => this.logger.debug("Key:" + key))
+        this.logger.debug("END OF PASSING ARGUMENTS:");
+        this.action(message[0] as Message);
+    }
 }
 
 export abstract class MessageDeleteAction extends EventAction {
@@ -286,6 +299,10 @@ export abstract class MessageReactionAddAction extends EventAction {
      * @param user The user that applied the guild or reaction emoji
      */
     abstract action(messageReaction : MessageReaction, user : User) : void
+
+    passArguments(...args: any[]) {
+        this.action(args[0], args[1]);
+    }
 }
 
 export abstract class MessageReactionRemoveAction extends EventAction {

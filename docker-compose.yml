@@ -7,10 +7,10 @@ services:
       - ./bot-environment.env
       - ./mariadb-environment.env
   
-  registration:
-    build: ./registration
-    ports:
-      - "9897:9897"
+#  registration:
+#    build: ./registration
+#    ports:
+#      - "9897:9897"
 
   database:
     image: mariadb
