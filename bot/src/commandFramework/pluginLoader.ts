@@ -2,12 +2,23 @@ import { Message } from "discord.js";
 import { EventAction } from "./eventAction";
 import { Command } from "./interfaces";
 
+import * as fs from "fs"
 import * as Logging from "../logging"
 import { PluginDependencies } from "../dependencyInjection";
 let logger = Logging.buildLogger("pluginLoader");
 
 const commandConstructors: CommandConstructor[] = [];
 const eventActionConstructors: EventActionConstructor[] = [];
+
+export function loadPlugins(pluginFolderPath : string) {
+    fs.readdirSync(pluginFolderPath).forEach((plugin : string) => {
+        try {
+            require(pluginFolderPath + "/" + plugin);
+        } catch {
+            logger.error(`Failed to load plugin ${plugin}!`);
+        }
+    });
+}
 
 export function getCommandConstructors() {
     return commandConstructors;

@@ -13,4 +13,9 @@ export interface CommandFactory {
      * @returns Returns the command instance, if the command issued by the users exists, undefined otherwise.
      */
     build(command : string, message : Message, dependencies : PluginDependencies) : Command|undefined
+
+    /**
+     * Reloads commands.
+     */
+    reload() : void
 }

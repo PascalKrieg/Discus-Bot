@@ -7,17 +7,17 @@ import * as path from "path";
 
 import * as Logging from "./logging"
 import { DiscordWrapper } from "./controller/discordWrapper";
+import { loadPlugins } from "./commandFramework";
 let logger = Logging.buildLogger("index");
 
 checkEnvironmentVariables();
 
+let pluginPath = path.join(__dirname, "/model/plugins");
+loadPlugins(pluginPath)
+
 let repository = DIContainer.get<Repository>(TYPES.Repository);
 let spotifyApi = DIContainer.get<SpotifyAPI>(TYPES.SpotifyAPI);
-
-
 let discord = DIContainer.get<DiscordWrapper>(TYPES.DiscordWrapper);
-let pluginPath = path.join(__dirname, "/model/plugins");
-discord.loadPlugins(pluginPath)
 discord.startClient();
 
 startHttpServer()

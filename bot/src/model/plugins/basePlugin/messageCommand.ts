@@ -7,11 +7,9 @@ export class MessageCommandAction extends EventActions.MessageAction {
     readonly ignorePrefix = "//"
 
     action(message : Message): void {
-        this.logger.info("Received message event")
         if (!message)
             return;
 
-        this.logger.info(JSON.stringify(message))
         if (message.content.startsWith(this.ignorePrefix)) {
             return;
         }

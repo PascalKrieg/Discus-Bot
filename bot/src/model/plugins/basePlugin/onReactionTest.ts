@@ -6,10 +6,7 @@ import { EventActions, RegisteredEventAction } from "../../../commandFramework";
 export class OnReactionTest extends EventActions.MessageReactionAddAction {
 
     action(messageReaction: MessageReaction, user: User): void {
-
-        this.logger.debug(JSON.stringify(messageReaction));
-        this.logger.debug(JSON.stringify(user));
-
+        this.logger.debug("OnReactionTest executed!")
     }
 
 }

@@ -1,5 +1,4 @@
 import "reflect-metadata";
-import * as fs from "fs"
 import * as Discord from "discord.js"
 import * as Logging from "../logging"
 import { DiscordWrapper } from "./discordWrapper";
@@ -19,22 +18,13 @@ export class DiscordWrapperImpl implements DiscordWrapper {
         this.client = new Discord.Client();
     }
 
-    loadPlugins(pluginFolderPath : string) {
-        fs.readdirSync(pluginFolderPath).forEach((plugin : string) => {
-            try {
-                require(pluginFolderPath + "/" + plugin);
-            } catch {
-                logger.error(`Failed to load plugin ${plugin}!`);
-            }
-        });
-    }
 
     private registerEventActions() {
         let eventActionConstructors = getEventActionConstructors();
         eventActionConstructors.forEach((ctor : EventActionConstructor) => {
             let eventString = ctor.prototype.GetEventString();
             let callback = (...args : any[]) => {
-                logger.verbose("Callback called for " + ctor.name)
+                logger.debug("Callback called for " + ctor.name)
                 try {
                     let eventAction = new ctor(this.dependencies.clone());
                     eventAction.passArguments(args);

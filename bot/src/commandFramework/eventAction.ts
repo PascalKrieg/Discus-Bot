@@ -25,8 +25,9 @@ export abstract class ChannelCreateAction extends EventAction {
      */
     abstract action(channel :  DMChannel|GuildChannel) : void
 
-    passArguments(...args: any[]) {
-        this.action(args[0]);
+    passArguments(args: any[]) {
+        let [channel] = args
+        this.action(channel);
     }
 }
 
@@ -39,6 +40,11 @@ export abstract class ChannelDeleteAction extends EventAction {
      * @param channel The channel that was deleted
      */
     abstract action(channel :  DMChannel|GuildChannel) : void
+
+    passArguments(args: any[]) {
+        let [channel] = args
+        this.action(channel);
+    }
 }
 
 export abstract class ChannelPinsUpdateAction extends EventAction {
@@ -52,6 +58,11 @@ export abstract class ChannelPinsUpdateAction extends EventAction {
      * @param time The time of the pins update
      */
     abstract action(channel :  DMChannel|GuildChannel, time : Date) : void
+
+    passArguments(args: any[]) {
+        let [channel, time] = args
+        this.action(channel, time);
+    }
 }
 
 
@@ -65,6 +76,11 @@ export abstract class ChannelUpdateAction extends EventAction {
      * @param newChannel The channel after the update
      */
     abstract action(oldChannel : DMChannel|GuildChannel, newChannel : DMChannel|GuildChannel) : void
+
+    passArguments(args: any[]) {
+        let [oldChannel, newChannel] = args
+        this.action(oldChannel, newChannel);
+    }
 }
 
 export abstract class EmojiCreateAction extends EventAction {
@@ -76,6 +92,11 @@ export abstract class EmojiCreateAction extends EventAction {
      * @param emoji The emoji that was created
      */
     abstract action(emoji : GuildEmoji) : void
+
+    passArguments(args: any[]) {
+        let [emoji] = args
+        this.action(emoji);
+    }
 }
 
 
@@ -88,6 +109,11 @@ export abstract class EmojiDeleteAction extends EventAction {
      * @param emoji The emoji that was deleted
      */
     abstract action(emoji : GuildEmoji) : void
+
+    passArguments(args: any[]) {
+        let [emoji] = args
+        this.action(emoji);
+    }
 }
 
 export abstract class EmojiUpdateAction extends EventAction {
@@ -100,6 +126,11 @@ export abstract class EmojiUpdateAction extends EventAction {
      * @param newEmoji The new emoji
      */
     abstract action(oldEmoji : GuildEmoji, newEmoji : GuildEmoji) : void
+
+    passArguments(args: any[]) {
+        let [oldEmoji, newEmoji] = args
+        this.action(oldEmoji, newEmoji);
+    }
 }
 
 
@@ -113,6 +144,11 @@ export abstract class GuildBanAddAction extends EventAction {
      * @param user The user that was banned
      */
     abstract action(guild : Guild, user : User) : void
+
+    passArguments(args: any[]) {
+        let [guild, user] = args
+        this.action(guild, user);
+    }
 }
 
 
@@ -126,6 +162,11 @@ export abstract class GuildBanRemoveAction extends EventAction {
      * @param user The user that was unbanned
      */
     abstract action(guild : Guild, user : User) : void
+
+    passArguments(args: any[]) {
+        let [guild, user] = args
+        this.action(guild, user);
+    }
 }
 
 
@@ -138,6 +179,11 @@ export abstract class GuildJoinAction extends EventAction {
      * @param guild The joined guild
      */
     abstract action(guild : Guild) : void
+
+    passArguments(args: any[]) {
+        let [guild] = args
+        this.action(guild);
+    }
 }
 
 export abstract class GuildLeaveAction extends EventAction {
@@ -149,6 +195,11 @@ export abstract class GuildLeaveAction extends EventAction {
      * @param guild The guild that was left/deleted
      */
     abstract action(guild : Guild) : void
+
+    passArguments(args: any[]) {
+        let [guild] = args
+        this.action(guild);
+    }
 }
 
 export abstract class GuildIntegrationsUpdateAction extends EventAction {
@@ -160,6 +211,11 @@ export abstract class GuildIntegrationsUpdateAction extends EventAction {
      * @param guild The guild whose integrations were updated
      */
     abstract action(guild : Guild) : void
+
+    passArguments(args: any[]) {
+        let [guild] = args
+        this.action(guild);
+    }
 }
 
 
@@ -172,6 +228,11 @@ export abstract class GuildMemberAddAction extends EventAction {
      * @param guildMember The member that has joined a guild
      */
     abstract action(guildMember : GuildMember) : void
+
+    passArguments(args: any[]) {
+        let [guildMember] = args
+        this.action(guildMember);
+    }
 }
 
 export abstract class GuildMemberAvailableAction extends EventAction {
@@ -183,6 +244,11 @@ export abstract class GuildMemberAvailableAction extends EventAction {
      * @param guildMember The member that became available
      */
     abstract action(guildMember : GuildMember) : void
+
+    passArguments(args: any[]) {
+        let [guildMember] = args
+        this.action(guildMember);
+    }
 }
 
 export abstract class GuildMemberRemoveAction extends EventAction {
@@ -194,6 +260,11 @@ export abstract class GuildMemberRemoveAction extends EventAction {
      * @param guildMember The member that has left/been kicked from the guild
      */
     abstract action(guildMember : GuildMember) : void
+
+    passArguments(args: any[]) {
+        let [guildMember] = args
+        this.action(guildMember);
+    }
 }
 
 export abstract class GuildMemberUpdateAction extends EventAction {
@@ -207,6 +278,11 @@ export abstract class GuildMemberUpdateAction extends EventAction {
      * @param newMemver The member after the update
      */
     abstract action(oldMember : GuildMember, newMemver : GuildMember) : void
+
+    passArguments(args: any[]) {
+        let [oldMember, newMember] = args
+        this.action(oldMember, newMember);
+    }
 }
 
 export abstract class GuildUnavailableAction extends EventAction {
@@ -218,6 +294,11 @@ export abstract class GuildUnavailableAction extends EventAction {
      * @param guild The guild that has become unavailable
      */
     abstract action(guild : Guild) : void
+
+    passArguments(args: any[]) {
+        let [guild] = args
+        this.action(guild);
+    }
 }
 
 export abstract class GuildUpdateAction extends EventAction {
@@ -230,6 +311,11 @@ export abstract class GuildUpdateAction extends EventAction {
      * @param newGuild The guild after the update
      */
     abstract action(guild : Guild) : void
+
+    passArguments(args: any[]) {
+        let [guild] = args
+        this.action(guild);
+    }
 }
 
 export abstract class InviteCreateAction extends EventAction {
@@ -242,6 +328,11 @@ export abstract class InviteCreateAction extends EventAction {
      * @param invite The invite that was created
      */
     abstract action(invite : Invite) : void
+
+    passArguments(args: any[]) {
+        let [invite] = args
+        this.action(invite);
+    }
 }
 
 export abstract class InviteDeleteAction extends EventAction {
@@ -254,6 +345,11 @@ export abstract class InviteDeleteAction extends EventAction {
      * @param invite The invite that was deleted
      */
     abstract action(invite : Invite) : void
+
+    passArguments(args: any[]) {
+        let [invite] = args
+        this.action(invite);
+    }
 }
 
 export abstract class MessageAction extends EventAction {
@@ -267,12 +363,9 @@ export abstract class MessageAction extends EventAction {
      */
     abstract action(message : Message) : void
 
-    passArguments(...args: any[]) {
-        this.logger.debug("PASSING ARGUMENTS:");
+    passArguments(args: any[]) {
         let [message] = args;
-        Object.keys(message[0]).forEach(key => this.logger.debug("Key:" + key))
-        this.logger.debug("END OF PASSING ARGUMENTS:");
-        this.action(message[0] as Message);
+        this.action(message as Message);
     }
 }
 
@@ -286,6 +379,11 @@ export abstract class MessageDeleteAction extends EventAction {
      * @param message The deleted message
      */
     abstract action(message : Message) : void
+
+    passArguments(args: any[]) {
+        let [message] = args
+        this.action(message);
+    }
 }
 
 export abstract class MessageReactionAddAction extends EventAction {
@@ -300,8 +398,9 @@ export abstract class MessageReactionAddAction extends EventAction {
      */
     abstract action(messageReaction : MessageReaction, user : User) : void
 
-    passArguments(...args: any[]) {
-        this.action(args[0], args[1]);
+    passArguments(args: any[]) {
+        let [messageReaction, user] = args;
+        this.action(messageReaction, user);
     }
 }
 
@@ -316,6 +415,11 @@ export abstract class MessageReactionRemoveAction extends EventAction {
      * @param user The user whose emoji or reaction emoji was removed
      */
     abstract action(messageReaction : MessageReaction, user : User) : void
+
+    passArguments(args: any[]) {
+        let [reaction, user] = args
+        this.action(reaction, user);
+    }
 }
 
 export abstract class MessageUpdateAction extends EventAction {
@@ -329,6 +433,11 @@ export abstract class MessageUpdateAction extends EventAction {
      * @param newMessage The message after the update
      */
     abstract action(oldMessage : Message, newMessage : Message) : void
+
+    passArguments(args: any[]) {
+        let [oldMessage, newMessage] = args
+        this.action(oldMessage, newMessage);
+    }
 }
 
 export abstract class PresenceUpdateAction extends EventAction {
@@ -342,6 +451,11 @@ export abstract class PresenceUpdateAction extends EventAction {
      * @param newMessage The presence after the update
      */
     abstract action(oldPresence : Presence|undefined, newPresence : Presence) : void
+
+    passArguments(args: any[]) {
+        let [oldPresence, newPresence] = args
+        this.action(oldPresence, newPresence);
+    }
 }
 
 export abstract class RoleCreateAction extends EventAction {
@@ -354,6 +468,11 @@ export abstract class RoleCreateAction extends EventAction {
      * @param role The role that was created
      */
     abstract action(role : Role) : void
+
+    passArguments(args: any[]) {
+        let [role] = args
+        this.action(role);
+    }
 }
 
 export abstract class RoleDeleteAction extends EventAction {
@@ -366,6 +485,11 @@ export abstract class RoleDeleteAction extends EventAction {
      * @param role The role that was deleted
      */
     abstract action(role : Role) : void
+
+    passArguments(args: any[]) {
+        let [role] = args
+        this.action(role);
+    }
 }
 
 export abstract class RoleUpdateAction extends EventAction {
@@ -379,6 +503,11 @@ export abstract class RoleUpdateAction extends EventAction {
      * @param newRole The role after the update
      */
     abstract action(oldRole : Role, newRole : Role) : void
+
+    passArguments(args: any[]) {
+        let [oldRole, newRole] = args
+        this.action(oldRole, newRole);
+    }
 }
 
 export abstract class TypingStartAction extends EventAction {
@@ -392,6 +521,11 @@ export abstract class TypingStartAction extends EventAction {
      * @param user The user that started typing
      */
     abstract action(channel : Channel, user : User) : void
+
+    passArguments(args: any[]) {
+        let [channel, user] = args
+        this.action(channel, user);
+    }
 }
 
 export abstract class VoiceStateUpdate extends EventAction {
@@ -405,4 +539,9 @@ export abstract class VoiceStateUpdate extends EventAction {
      * @param newState The voice state after the update
      */
     abstract action(oldState : VoiceState, newState : VoiceState) : void
+
+    passArguments(args: any[]) {
+        let [oldState, newState] = args
+        this.action(oldState, newState);
+    }
 }
