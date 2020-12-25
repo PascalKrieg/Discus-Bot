@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { EventActions, RegisteredEventAction } from "../../../commandFramework";
+import { EventActions, RegisteredEventAction } from "../../commandFramework";
 
 @RegisteredEventAction
 export class MessageCommandAction extends EventActions.MessageAction {

@@ -1,5 +1,5 @@
 import { DMChannel, GuildChannel, TextChannel } from "discord.js";
-import { EventActions, RegisteredEventAction } from "../../../commandFramework";
+import { EventActions, RegisteredEventAction } from "../../commandFramework";
 
 @RegisteredEventAction
 export class TestEventAction extends EventActions.ChannelCreateAction {

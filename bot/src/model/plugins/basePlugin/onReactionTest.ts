@@ -1,5 +1,5 @@
 import { MessageReaction, User } from "discord.js";
-import { EventActions, RegisteredEventAction } from "../../../commandFramework";
+import { EventActions, RegisteredEventAction } from "../../commandFramework";
 
 
 @RegisteredEventAction

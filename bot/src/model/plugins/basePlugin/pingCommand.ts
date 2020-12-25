@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { RegisteredCommand } from "../../../commandFramework";
+import { RegisteredCommand } from "../../commandFramework";
 import { PluginDependencies } from "../../../dependencyInjection";
 
 @RegisteredCommand

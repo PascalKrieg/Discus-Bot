@@ -4,7 +4,7 @@ import { TYPES } from "./types"
 
 import { Repository } from "../model/data/repository"
 import { RepositoryImpl } from "../model/data/repositoryImpl"
-import { CommandFactory, CommandFactoryImpl } from "../commandFramework"
+import { CommandFactory, CommandFactoryImpl } from "../model/commandFramework"
 import { SpotifyAPI } from "../model/pluginDependencies/spotify/spotifyApi"
 import { SpotifyAPIImpl } from "../model/pluginDependencies/spotify/spotifyApiImpl"
 import { PluginDependencies } from "./pluginDependencies"

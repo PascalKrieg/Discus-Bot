@@ -2,7 +2,7 @@ import { Channel, GuildCreateChannelOptions, Message, MessageMentions, Overwrite
 import { Repository } from "../../data/repository";
 
 import * as Logging from "../../../logging"
-import { CommandInfo, RegisteredCommand } from "../../../commandFramework";
+import { CommandInfo, RegisteredCommand } from "../../commandFramework";
 import { PluginDependencies } from "../../../dependencyInjection";
 let logger = Logging.buildLogger("createPartyCommand");
 

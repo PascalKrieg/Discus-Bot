@@ -1,5 +1,5 @@
 export * from "./interfaces"
 export * from "./commandFactory"
-export * from "./pluginLoader"
+export * from "../../controller/pluginLoader"
 export * from "./commandFactoryImpl"
 export * as EventActions from "./eventAction"

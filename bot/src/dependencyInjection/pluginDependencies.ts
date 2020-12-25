@@ -1,4 +1,4 @@
-import { CommandFactory } from "../commandFramework";
+import { CommandFactory } from "../model/commandFramework";
 import { Repository } from "../model/data/repository";
 import { SpotifyAPI } from "../model/pluginDependencies/spotify/spotifyApi";
 

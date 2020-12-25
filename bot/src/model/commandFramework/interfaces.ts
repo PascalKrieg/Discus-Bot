@@ -9,3 +9,9 @@ export interface CommandInfo {
     aliases : string[];
     helpText : string;
 }
+
+export interface PluginInfo {
+    name : string;
+    description : string;
+    author : string;
+}

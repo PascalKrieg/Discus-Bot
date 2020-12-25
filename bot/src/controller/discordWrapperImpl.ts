@@ -4,7 +4,8 @@ import * as Logging from "../logging"
 import { DiscordWrapper } from "./discordWrapper";
 import { PluginDependencies, TYPES } from "../dependencyInjection";
 import { inject, injectable } from "inversify";
-import { EventActionConstructor, getEventActionConstructors } from "../commandFramework";
+import { EventActionConstructor, getPlugins } from "../model/commandFramework";
+import { Plugin } from "../model/commandFramework/plugin";
 let logger = Logging.buildLogger("discordInitializer");
 
 @injectable()
@@ -20,23 +21,28 @@ export class DiscordWrapperImpl implements DiscordWrapper {
 
 
     private registerEventActions() {
-        let eventActionConstructors = getEventActionConstructors();
-        eventActionConstructors.forEach((ctor : EventActionConstructor) => {
-            let eventString = ctor.prototype.GetEventString();
-            let callback = (...args : any[]) => {
-                logger.debug("Callback called for " + ctor.name)
-                try {
-                    let eventAction = new ctor(this.dependencies.clone());
-                    eventAction.passArguments(args);
+        let plugins = getPlugins();
+        plugins.forEach((plugin : Plugin) => {
+
+            let eventActionConstructors = plugin.getEventActionConstructors();
+
+            eventActionConstructors.forEach((ctor : EventActionConstructor) => {
+                let eventString = ctor.prototype.GetEventString();
+                let callback = (...args : any[]) => {
+                    try {
+                        let eventAction = new ctor(this.dependencies.clone());
+                        eventAction.passArguments(args);
+                        
+                    } catch (error) {
+                        logger.error(`Error occured during action execution of action ${ctor.name}\n${error}`);
+                    }
                     
-                } catch (error) {
-                    logger.error(`Error occured during action execution of action ${ctor.name}\n${error}`);
                 }
-                
-            }
-            this.client.on(eventString, callback);
-            logger.info(`Registered Event "${ctor.name}" to occur on ${eventString}`);
-        })
+                this.client.on(eventString, callback);
+                logger.info(`(${plugin.getInfo().name}) Registered Event "${ctor.name}" to occur on ${eventString}`);
+            });
+
+        });
     }
 
     async startClient() {

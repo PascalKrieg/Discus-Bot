@@ -7,7 +7,7 @@ import * as path from "path";
 
 import * as Logging from "./logging"
 import { DiscordWrapper } from "./controller/discordWrapper";
-import { loadPlugins } from "./commandFramework";
+import { loadPlugins } from "./model/commandFramework";
 let logger = Logging.buildLogger("index");
 
 checkEnvironmentVariables();

@@ -2,10 +2,12 @@ import "reflect-metadata";
 import { Message } from "discord.js";
 import { injectable } from "inversify";
 import {Command, CommandInfo} from "."
-import { PluginDependencies } from "../dependencyInjection/pluginDependencies";
-import * as Logging from "../logging";
+import { PluginDependencies } from "../../dependencyInjection/pluginDependencies";
+import * as Logging from "../../logging";
 import { CommandFactory } from "./commandFactory";
-import { CommandConstructor, getCommandConstructors } from "./pluginLoader";
+import { CommandConstructor, getPlugins } from "../../controller/pluginLoader";
+import { Plugin } from "./plugin";
+import { PluginInfo } from "./interfaces";
 
 let logger = Logging.buildLogger("CommandFactoryImpl");
 
@@ -45,15 +47,18 @@ export class CommandFactoryImpl implements CommandFactory {
     }
 
     private registerAllCommands() {
-        let commandConstructors = getCommandConstructors()
-        for (let i = 0; i < commandConstructors.length; i++) {
-            let ctor = commandConstructors[i]
-            let commandInfo = ctor.prototype.getCommandInfo()
-            this.registerCommand(commandInfo, ctor)
-        }
+        let plugins = getPlugins();
+        plugins.forEach((plugin : Plugin) => {
+            let commandConstructors = plugin.getCommandConstructors()
+            for (let i = 0; i < commandConstructors.length; i++) {
+                let ctor = commandConstructors[i]
+                let commandInfo = ctor.prototype.getCommandInfo()
+                this.registerCommand(plugin, commandInfo, ctor)
+            }
+        })
     }
 
-    private registerCommand(commandInfo : CommandInfo, ctor : CommandConstructor) {
+    private registerCommand(plugin : Plugin, commandInfo : CommandInfo, ctor : CommandConstructor) {
         let conflicts = this.getConflictingCommands(commandInfo);
             
         if (conflicts.length > 0) {
@@ -72,7 +77,7 @@ export class CommandFactoryImpl implements CommandFactory {
             this.commandInfoMap.set(alias.toLowerCase(), commandInfo);
         })
 
-        logger.info(`Registered command ${commandInfo.command} with aliases ${commandInfo.aliases.toString()}`);
+        logger.info(`(${plugin.getInfo().name}) Registered command ${commandInfo.command} with aliases ${commandInfo.aliases.toString()}`);
     }
 
     private getConflictingCommands(commandInfo : CommandInfo) {

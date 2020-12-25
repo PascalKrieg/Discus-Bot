@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { EventActions, RegisteredEventAction } from "../../../commandFramework";
+import { EventActions, RegisteredEventAction } from "../../commandFramework";
 import { getTrackURIFromLink, isSpotifyURL } from "../../pluginDependencies/spotify"
 
 @RegisteredEventAction
@@ -13,6 +13,11 @@ export class PartyMessageAction extends EventActions.MessageAction {
             if(await this.dependencies.repository.isChannelPartyChannel(message.channel.id) == false) {
                 return;
             }
+        } catch(error) {
+            return;
+        }
+
+        try {
             this.logger.verbose("Handling party channel message: " + message.content);
             this.handlePartyChannelCommand(message);
 
