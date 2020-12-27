@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { RegisteredCommand } from "../../commandFramework";
-import { PluginDependencies } from "../../../dependencyInjection";
+import { PluginDependencies } from "../../services/pluginDependencies";
 
 @RegisteredCommand
 export class PingCommand {

@@ -4,7 +4,7 @@ import { Command, HttpHandler } from "../model/commandFramework/interfaces";
 
 import * as fs from "fs"
 import * as Logging from "../logging"
-import { PluginDependencies } from "../dependencyInjection";
+import { PluginDependencies } from "../model/services/pluginDependencies";
 import { Plugin } from "../model/commandFramework/plugin";
 import { Router } from "express";
 let logger = Logging.buildLogger("pluginLoader");

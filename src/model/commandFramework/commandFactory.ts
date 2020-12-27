@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { PluginDependencies } from "../../dependencyInjection";
+import { PluginDependencies } from "../services/pluginDependencies";
 import { Command } from "./interfaces";
 
 /**

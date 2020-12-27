@@ -1,6 +1,6 @@
 import { Channel, DMChannel, Guild, GuildChannel, GuildEmoji, GuildMember, Invite, Message, MessageReaction, Presence, Role, User, VoiceState } from "discord.js";
 import { Logger } from "winston";
-import { PluginDependencies } from "../../dependencyInjection";
+import { PluginDependencies } from "../services/pluginDependencies";
 import { buildLogger } from "../../logging"
 
 export abstract class EventAction {

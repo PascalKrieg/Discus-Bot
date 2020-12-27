@@ -3,7 +3,7 @@ import { Repository } from "../../data/repository";
 import { SpotifyAPI } from "../../services/spotify/spotifyApi";
 import { CommandInfo, RegisteredCommand } from "../../commandFramework";
 import * as crypto from "crypto";
-import { PluginDependencies } from "../../../dependencyInjection";
+import { PluginDependencies } from "../../services/pluginDependencies";
 
 @RegisteredCommand
 export class RegisterMeCommand {

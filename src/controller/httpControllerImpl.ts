@@ -1,5 +1,6 @@
 import { inject, injectable } from "inversify";
-import { PluginDependencies, TYPES } from "../dependencyInjection";
+import { TYPES } from "../dependencyInjection";
+import { PluginDependencies } from "../model/services/pluginDependencies"
 import { HttpController } from "./httpController";
 
 import express from "express";

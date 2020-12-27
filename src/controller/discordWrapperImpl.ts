@@ -1,7 +1,8 @@
 import * as Discord from "discord.js"
 import * as Logging from "../logging"
 import { DiscordWrapper } from "./discordWrapper";
-import { PluginDependencies, TYPES } from "../dependencyInjection";
+import { TYPES } from "../dependencyInjection";
+import { PluginDependencies } from "../model/services/pluginDependencies"
 import { inject, injectable } from "inversify";
 import { EventActionConstructor, getPlugins } from "../model/commandFramework";
 import { Plugin } from "../model/commandFramework/plugin";

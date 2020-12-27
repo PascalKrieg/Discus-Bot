@@ -3,7 +3,7 @@ import { Repository } from "../../data/repository";
 
 import * as Logging from "../../../logging"
 import { CommandInfo, RegisteredCommand } from "../../commandFramework";
-import { PluginDependencies } from "../../../dependencyInjection";
+import { PluginDependencies } from "../../services/pluginDependencies";
 let logger = Logging.buildLogger("createPartyCommand");
 
 @RegisteredCommand
