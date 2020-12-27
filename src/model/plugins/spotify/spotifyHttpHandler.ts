@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { PluginDependencies } from "../../../dependencyInjection";
+import { PluginDependencies } from "../../services/pluginDependencies";
 import { RegisteredHttpHandler } from "../../commandFramework";
 
 import * as express from "express";
