@@ -21,8 +21,15 @@ export class SpotifyAPIImpl implements SpotifyAPI{
         this.redirectUri = redirectUri;
         this.repository = repository;
     }
-    updateTokenPairFromState(state: string, code: string): Promise<void> {
-        throw new Error("Method not implemented.");
+    async updateTokenPairFromState(state: string, code: string): Promise<void> {
+        logger.verbose("Attempting to fetch token pair from code");
+        try {
+            let tokenPair = await this.fetchTokenFromCode(code);
+            logger.debug("Fetched token pair with expiration time " + tokenPair.expirationTime)
+            this.repository.finishCodeRequest(state, tokenPair);
+        } catch (err) {
+            throw err;
+        }
     }
     
     getRegisterUrl(state : string) : string {
@@ -71,19 +78,6 @@ export class SpotifyAPIImpl implements SpotifyAPI{
         let newToken = await this.fetchTokenFromRefresh(tokenPair)
         await this.repository.replaceTokens(tokenPair, newToken);
         return newToken;
-    }
-
-    async updateTokenPairFromRequestId(requestId : string) {
-        logger.verbose("Attempting to fetch token pair from code");
-        try {
-            let code = await this.repository.getRequestCodeById(requestId);
-            let tokenPair = await this.fetchTokenFromCode(code);
-            logger.debug("Fetched token pair with expiration time " + tokenPair.expirationTime)
-            this.repository.finishCodeRequest(requestId, tokenPair);
-        } catch (err) {
-            logger.error("Error while attempting to fetch token pair from code (requestId: " + requestId + ")");
-            throw err;
-        }
     }
 
     private fetchTokenFromRefresh(tokenPair : TokenPair) : Promise<TokenPair> {

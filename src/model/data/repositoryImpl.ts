@@ -330,26 +330,26 @@ export class RepositoryImpl implements Repository {
         }
     }
 
-    async finishCodeRequest(requestId: string, newToken: TokenPair) {
-        logger.debug(`Finishing code request with id ${requestId}`)
+    async finishCodeRequest(state: string, newToken: TokenPair) {
+        logger.debug(`Finishing code request with state ${state}`)
         let conn;
         try {
             conn = await this.getPool().getConnection();
             await conn.beginTransaction();
-            let idResult = await conn.query("SELECT discord_user FROM code_requests WHERE request_id = ?", [requestId]);
+            let idResult = await conn.query("SELECT discord_user FROM code_requests WHERE request_state = ?", [state]);
             let userId = idResult[0].discord_user;
             if (userId.length == 0) {
                 throw new Error("Not Found");
             }
-            logger.debug(`Code request with id ${requestId} belongs to user with user id ${userId}`);
+            logger.debug(`Code request with state ${state} belongs to user with user id ${userId}`);
 
             let res = await conn.query("UPDATE discord_users SET access_token = ?, refresh_token = ?, token_expiration = ? WHERE id = ?", [newToken.accessToken, newToken.refreshToken, newToken.expirationTime, userId]);
             if (res.affectedRows === 0) {
                 logger.error("Update of token pair affected 0 rows!");
             }
 
-            await conn.query("DELETE FROM code_requests WHERE request_id = ?", [requestId]);
-            logger.debug(`Successfully finished code request with id ${requestId} and deleted it.`)
+            await conn.query("DELETE FROM code_requests WHERE request_state = ?", [state]);
+            logger.debug(`Successfully finished code request with state ${state} and deleted it.`)
             await conn.commit();
         } catch(err) {
             conn?.rollback();

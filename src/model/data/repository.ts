@@ -18,7 +18,7 @@ export interface Repository {
     getRequestCodeById(id : string) : Promise<string>;
     getRequestCodeByState(state : string) : Promise<string>;
     deleteCodeRequest(id : string) : void;
-    finishCodeRequest(requestId : string, newToken : TokenPair) : void;
+    finishCodeRequest(state : string, newToken : TokenPair) : void;
     
     addPartyChannel(channel : Channel, owner : User, autoDelete? : Date) : void;
     getPartyChannelIds() : Promise<Array<Snowflake>>;
