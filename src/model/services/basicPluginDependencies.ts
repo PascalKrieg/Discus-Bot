@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import { inject, injectable } from "inversify";
 import { CommandFactory } from "../commandFramework";
 import { Repository } from "../data/repository";

@@ -224,23 +224,6 @@ export class RepositoryImpl implements Repository {
             if (conn) conn.end();
         }
     }
-    async getRequestCodeById(id: string): Promise<string> {
-        logger.debug(`Getting code request with id ${id}`)
-        let conn;
-        try {
-            conn = await this.getPool().getConnection();
-            let rows : any[] = await conn.query("SELECT code FROM code_requests WHERE request_id= ? ", [id]);
-            if (rows.length === 0) {
-                throw new Error("Request not found!");
-            }
-            return rows[0].code;
-        } catch(err) {
-            logger.error(err)
-            throw err;
-        } finally {
-            if (conn) conn.end();
-        }
-    }
 
     async getCodeIfPresent(userId : Snowflake) : Promise<string|undefined>{
         let conn;
@@ -264,7 +247,7 @@ export class RepositoryImpl implements Repository {
         let conn;
         try {
             conn = await this.getPool().getConnection();
-            let rows : any[] = await conn.query("SELECT code FROM code_requests WHERE state=", [state]);
+            let rows : any[] = await conn.query("SELECT code FROM code_requests WHERE request_state=", [state]);
             if (rows.length == 0) {
                 throw new Error("Request not found!");
             }
@@ -276,12 +259,12 @@ export class RepositoryImpl implements Repository {
             if (conn) conn.end();
         }
     }
-    async deleteCodeRequest(id: string) {
-        logger.debug(`Deleting code request with id ${id}`)
+    async deleteCodeRequest(state: string) {
+        logger.debug(`Deleting code request with state ${state}`)
         let conn;
         try {
             conn = await this.getPool().getConnection();
-            let result = await conn.query("DELETE FROM code_requests WHERE request_id = ", [id]);
+            let result = await conn.query("DELETE FROM code_requests WHERE request_state = ", [state]);
             if (result.affectedRows === 0) {
                 // nothing changed, what to do?
             }

@@ -1,4 +1,3 @@
-import "reflect-metadata"
 import { Container, interfaces } from "inversify"
 import { TYPES } from "./types"
 
@@ -24,8 +23,8 @@ DIContainer.bind<SpotifyAPI>(TYPES.SpotifyAPI).toDynamicValue((context : interfa
         throw new Error();
     }
 })
-DIContainer.bind<CommandFactory>(TYPES.CommandFactory).to(CommandFactoryImpl)
-DIContainer.bind<PluginDependencies>(TYPES.PluginDependencies).to(BasicPluginDependencies)
+DIContainer.bind<CommandFactory>(TYPES.CommandFactory).to(CommandFactoryImpl).inSingletonScope();
+DIContainer.bind<PluginDependencies>(TYPES.PluginDependencies).to(BasicPluginDependencies);
 DIContainer.bind<DiscordWrapper>(TYPES.DiscordWrapper).to(DiscordWrapperImpl);
 DIContainer.bind<HttpController>(TYPES.HttpController).to(HttpControllerImpl);
 

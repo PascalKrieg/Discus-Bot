@@ -15,7 +15,12 @@ export class MessageCommandAction extends EventActions.MessageAction {
         }
 
         if (this.isMessageBotCommand(message)) {
-            this.handleBotCommand(message);
+            try {
+                this.handleBotCommand(message);
+            } catch(error) {
+                this.logger.error(error);
+                message.channel.send("There was an error executing this command.")
+            }
         }
     }
 
@@ -26,12 +31,12 @@ export class MessageCommandAction extends EventActions.MessageAction {
     private handleBotCommand(message : Message) {
         try {
             let commandParts = this.seperateCommandParts(message.content);
-            this.logger.debug(message.author.tag + " typed command: " + commandParts.command)
+            this.logger.verbose(message.author.tag + " typed command: " + commandParts.command)
 
             this.dependencies.commandFactory.build(commandParts.command, message, this.dependencies)?.execute()
 
         } catch (err) {
-            this.logger.error(err)
+
             throw err;
         }
     }

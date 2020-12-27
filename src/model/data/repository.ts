@@ -15,9 +15,8 @@ export interface Repository {
     deleteUserToken(userId : Snowflake) : void;
 
     addCodeRequest(userId : Snowflake, state : string) : Promise<string>;
-    getRequestCodeById(id : string) : Promise<string>;
     getRequestCodeByState(state : string) : Promise<string>;
-    deleteCodeRequest(id : string) : void;
+    deleteCodeRequest(state : string) : void;
     finishCodeRequest(state : string, newToken : TokenPair) : void;
     
     addPartyChannel(channel : Channel, owner : User, autoDelete? : Date) : void;

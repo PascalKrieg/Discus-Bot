@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import { Message } from "discord.js";
 import { injectable } from "inversify";
 import {Command, CommandInfo} from "."
@@ -20,17 +19,24 @@ export class CommandFactoryImpl implements CommandFactory {
     readonly commandInfoMap : Map<string, CommandInfo> = new Map<string, CommandInfo>()
 
 
+    constructor() {
+        this.reload();
+    }
+
     reload() {
-        logger.info("Starting to load commands")
+        this.commandMap.clear();
+        this.commandInfoMap.clear();
+        logger.info(`Starting to load commands, ${getPlugins.length} plugins are available`);
         this.registerAllCommands();
     }
 
     build(command : string, message : Message, dependencies : PluginDependencies) : Command|undefined {
         let lowerCaseCommand = command.toLowerCase();
-        
+        logger.debug(`Building command for command ${command} in ${this.commandMap.size} different commands`)
         let ctor = this.commandMap.get(lowerCaseCommand);
         if (ctor) {
             let command = new ctor(message, dependencies.clone());
+            logger.debug(`Successfully built command object`)
             return command;
         } else {
             return undefined;
@@ -39,14 +45,17 @@ export class CommandFactoryImpl implements CommandFactory {
 
     private registerAllCommands() {
         let plugins = getPlugins();
+        let count = 0;
         plugins.forEach((plugin : Plugin) => {
             let commandConstructors = plugin.getCommandConstructors()
             for (let i = 0; i < commandConstructors.length; i++) {
-                let ctor = commandConstructors[i]
-                let commandInfo = ctor.prototype.getCommandInfo()
-                this.registerCommand(plugin, commandInfo, ctor)
+                let ctor = commandConstructors[i];
+                let commandInfo = ctor.prototype.getCommandInfo();
+                this.registerCommand(plugin, commandInfo, ctor);
+                count++;
             }
         })
+        logger.debug(`Loaded ${count}/${this.commandMap.size} commands/aliases`)
     }
 
     private registerCommand(plugin : Plugin, commandInfo : CommandInfo, ctor : CommandConstructor) {

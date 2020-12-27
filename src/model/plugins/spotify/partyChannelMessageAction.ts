@@ -19,15 +19,13 @@ export class PartyMessageAction extends EventActions.MessageAction {
 
         try {
             this.logger.verbose("Handling party channel message: " + message.content);
-            this.handlePartyChannelCommand(message);
 
-            let owner = await this.dependencies.repository.getPartyChannelOwner(message.channel.id);
             let urls = message.content.split(" ").filter((value) => isSpotifyURL(value));
-            
             if (urls.length == 0) {
-                this.logger.verbose("No URLs found in party channel message");
+                this.logger.debug("No URLs found in party channel message");
                 return
             }
+            let owner = await this.dependencies.repository.getPartyChannelOwner(message.channel.id);
 
             let trackURI = await getTrackURIFromLink(urls[0]);
             this.logger.debug(`trackURI ${trackURI} extracted`);
@@ -36,7 +34,6 @@ export class PartyMessageAction extends EventActions.MessageAction {
         } catch(err) {
             this.logger.error(err)
             message.channel.send("// Failed to add song. " + err.message);
-            throw err;
         }
     }
 }

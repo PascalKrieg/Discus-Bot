@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import * as Discord from "discord.js"
 import * as Logging from "../logging"
 import { DiscordWrapper } from "./discordWrapper";

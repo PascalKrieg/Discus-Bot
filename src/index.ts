@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { DIContainer, TYPES } from "./dependencyInjection";
 import * as server from "./controller/httpController"
 import * as path from "path";
@@ -15,9 +16,6 @@ loadPlugins(pluginPath)
 
 let discord = DIContainer.get<DiscordWrapper>(TYPES.DiscordWrapper);
 let httpController = DIContainer.get<server.HttpController>(TYPES.HttpController);
-
-let commandFactory = DIContainer.get<CommandFactory>(TYPES.CommandFactory);
-commandFactory.reload();
 
 discord.startClient();
 
