@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { Repository } from "../../data/repository";
-import { SpotifyAPI } from "../../pluginDependencies/spotify/spotifyApi";
+import { SpotifyAPI } from "../../services/spotify/spotifyApi";
 import { CommandInfo, RegisteredCommand } from "../../commandFramework";
 import * as crypto from "crypto";
 import { PluginDependencies } from "../../../dependencyInjection";

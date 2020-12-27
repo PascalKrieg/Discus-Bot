@@ -5,5 +5,5 @@ export interface SpotifyAPI {
     addToQueue(tokenPair : TokenPair, trackURI : string) : Promise<void>
     updateTokenIfExpiringSoon(tokenPair : TokenPair) : Promise<TokenPair> 
     updateToken(tokenPair : TokenPair) : Promise<TokenPair> 
-    updateTokenPairFromRequestId(requestId : string) : Promise<void>
+    updateTokenPairFromState(state : string, code : string) : Promise<void>
 }

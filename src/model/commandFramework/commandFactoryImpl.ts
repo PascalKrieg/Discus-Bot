@@ -7,7 +7,6 @@ import * as Logging from "../../logging";
 import { CommandFactory } from "./commandFactory";
 import { CommandConstructor, getPlugins } from "../../controller/pluginLoader";
 import { Plugin } from "./plugin";
-import { PluginInfo } from "./interfaces";
 
 let logger = Logging.buildLogger("CommandFactoryImpl");
 
@@ -20,17 +19,9 @@ export class CommandFactoryImpl implements CommandFactory {
     readonly commandMap : Map<string, CommandConstructor> = new Map<string, CommandConstructor>()
     readonly commandInfoMap : Map<string, CommandInfo> = new Map<string, CommandInfo>()
 
-    /**
-     * Constructs a new CommandFactory.
-     * This should probably not be called directly, as creation of this object should be handled by the dependency inversion framework.
-     * @param repository The repository used for persistance.
-     * @param spotifyApi The spotify API wrapper used.
-     */
-    constructor() {
-        this.registerAllCommands();
-    }
 
     reload() {
+        logger.info("Starting to load commands")
         this.registerAllCommands();
     }
 
@@ -77,7 +68,7 @@ export class CommandFactoryImpl implements CommandFactory {
             this.commandInfoMap.set(alias.toLowerCase(), commandInfo);
         })
 
-        logger.info(`(${plugin.getInfo().name}) Registered command ${commandInfo.command} with aliases ${commandInfo.aliases.toString()}`);
+        logger.verbose(`(${plugin.getInfo().name}) Registered command ${commandInfo.command} with aliases ${commandInfo.aliases.toString()}`);
     }
 
     private getConflictingCommands(commandInfo : CommandInfo) {

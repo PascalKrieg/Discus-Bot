@@ -2,16 +2,13 @@ version: "3.7"
 
 services:
   bot:
-    build: ./bot
+    build: .
     env_file:
       - ./bot-environment.env
       - ./mariadb-environment.env
+    ports:
+      - "9897:9897"
   
-#  registration:
-#    build: ./registration
-#    ports:
-#      - "9897:9897"
-
   database:
     image: mariadb
     restart: always

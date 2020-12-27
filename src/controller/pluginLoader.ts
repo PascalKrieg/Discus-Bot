@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { EventAction } from "../model/commandFramework/eventAction";
-import { Command } from "../model/commandFramework/interfaces";
+import { Command, HttpHandler } from "../model/commandFramework/interfaces";
 
 import * as fs from "fs"
 import * as Logging from "../logging"
@@ -13,29 +13,36 @@ const pluginList : Plugin[] = []
 
 let commandConstructors: CommandConstructor[] = [];
 let eventActionConstructors: EventActionConstructor[] = [];
+let httpHandlerConstructors: HttpHandlerConstructor[] = []
 
 export function loadPlugins(pluginFolderPath : string) {
     fs.readdirSync(pluginFolderPath).forEach((pluginName : string) => {
         commandConstructors = [];
         eventActionConstructors = [];
+        httpHandlerConstructors = []
         try {
             const pluginImport = require(pluginFolderPath + "/" + pluginName);
 
             const commandCtors = [...commandConstructors]
             const eventActionCtors = [...eventActionConstructors]
-            let router : Router|undefined = undefined;
+            const httpHandlerCtors = [...httpHandlerConstructors]
 
             if (pluginImport.getPluginInfo === undefined || pluginImport.getPluginInfo() === undefined) {
                 logger.error(`Failed to load plugin ${pluginName}! No plugin info provided.`);
                 return;
             }
 
-            if (pluginImport.getExpressRouter !== undefined && pluginImport.getExpressRouter() !== undefined) {
-                router = pluginImport.getExpressRouter();
+            if (httpHandlerCtors.length > 1) {
+                logger.error(`Failed to load plugin ${pluginName}! Multiple Routers defined in this plugin.`);
+                return;
             }
-            
 
-            let plugin = new Plugin(pluginImport.getPluginInfo(), commandCtors, eventActionCtors, router)
+            let handler;
+            if (httpHandlerCtors.length === 1) {
+                handler = httpHandlerCtors[0]
+            }
+
+            let plugin = new Plugin(pluginImport.getPluginInfo(), commandCtors, eventActionCtors, handler)
             pluginList.push(plugin);
             
         } catch {
@@ -55,7 +62,12 @@ export type CommandConstructor = {
 
 export type EventActionConstructor = {
     new(dependencies : PluginDependencies): EventAction;
-    readonly prototype: EventAction
+    readonly prototype: EventAction;
+}
+
+export type HttpHandlerConstructor = {
+    new(dependencies : PluginDependencies): HttpHandler;
+    readonly prototype: HttpHandler;
 }
 
 /**
@@ -69,5 +81,10 @@ export function RegisteredCommand<T extends CommandConstructor>(ctor: T) {
 
 export function RegisteredEventAction<T extends EventActionConstructor>(ctor: T) {
     eventActionConstructors.push(ctor);
+    return ctor;
+}
+
+export function RegisteredHttpHandler<T extends HttpHandlerConstructor>(ctor: T) {
+    httpHandlerConstructors.push(ctor);
     return ctor;
 }

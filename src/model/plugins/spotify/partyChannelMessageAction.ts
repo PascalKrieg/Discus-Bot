@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { EventActions, RegisteredEventAction } from "../../commandFramework";
-import { getTrackURIFromLink, isSpotifyURL } from "../../pluginDependencies/spotify"
+import { getTrackURIFromLink, isSpotifyURL } from "../../services/spotify"
 
 @RegisteredEventAction
 export class PartyMessageAction extends EventActions.MessageAction {

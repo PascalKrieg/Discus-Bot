@@ -1,6 +1,6 @@
 import { CommandFactory } from "../model/commandFramework";
 import { Repository } from "../model/data/repository";
-import { SpotifyAPI } from "../model/pluginDependencies/spotify/spotifyApi";
+import { SpotifyAPI } from "../model/services/spotify/spotifyApi";
 
 export interface PluginDependencies {
     commandFactory : CommandFactory;

@@ -3,6 +3,7 @@ import { PluginInfo } from "../../commandFramework"
 export * from "./createPartyCommand"
 export * from "./registerMeCommand"
 export * from "./partyChannelMessageAction"
+export * from "./spotifyHttpHandler"
 
 export function getPluginInfo() : PluginInfo {
     return {

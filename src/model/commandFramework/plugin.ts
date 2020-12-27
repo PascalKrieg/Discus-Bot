@@ -1,5 +1,4 @@
-import { Router } from "express";
-import { CommandConstructor, EventActionConstructor } from "../../controller/pluginLoader";
+import { CommandConstructor, EventActionConstructor, HttpHandlerConstructor } from "../../controller/pluginLoader";
 import { PluginInfo } from "./interfaces";
 
 export class Plugin {
@@ -7,13 +6,13 @@ export class Plugin {
     private commandConstructors : CommandConstructor[];
     private eventActionConstructors : EventActionConstructor[];
 
-    private router? : Router;
+    private httpHandlerConstructor? : HttpHandlerConstructor;
 
-    constructor(info : PluginInfo, commandConstructors : CommandConstructor[], eventActionConstructors : EventActionConstructor[], router? : Router) {
+    constructor(info : PluginInfo, commandConstructors : CommandConstructor[], eventActionConstructors : EventActionConstructor[], httpHandlerConstructor? : HttpHandlerConstructor) {
         this.info = info;
         this.commandConstructors = commandConstructors;
         this.eventActionConstructors = eventActionConstructors;
-        this.router = router;
+        this.httpHandlerConstructor = httpHandlerConstructor;
     }
 
     getInfo() {
@@ -26,7 +25,7 @@ export class Plugin {
         return this.eventActionConstructors;
     }
 
-    getRouter() : Router | undefined {
-        return this.router;
+    getHttpHandlerConstructor() : HttpHandlerConstructor | undefined {
+        return this.httpHandlerConstructor;
     }
 }

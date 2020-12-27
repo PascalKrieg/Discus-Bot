@@ -21,6 +21,9 @@ export class SpotifyAPIImpl implements SpotifyAPI{
         this.redirectUri = redirectUri;
         this.repository = repository;
     }
+    updateTokenPairFromState(state: string, code: string): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
     
     getRegisterUrl(state : string) : string {
         let url = "https://accounts.spotify.com/authorize" 

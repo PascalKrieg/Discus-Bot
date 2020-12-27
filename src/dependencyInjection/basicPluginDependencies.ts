@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { inject, injectable } from "inversify";
 import { CommandFactory } from "../model/commandFramework";
 import { Repository } from "../model/data/repository";
-import { SpotifyAPI } from "../model/pluginDependencies/spotify/spotifyApi";
+import { SpotifyAPI } from "../model/services/spotify/spotifyApi";
 import { PluginDependencies } from "./pluginDependencies";
 import { TYPES } from "./types";
 

@@ -22,6 +22,7 @@ export class DiscordWrapperImpl implements DiscordWrapper {
 
     private registerEventActions() {
         let plugins = getPlugins();
+        logger.info("Registering discord events")
         plugins.forEach((plugin : Plugin) => {
 
             let eventActionConstructors = plugin.getEventActionConstructors();
@@ -39,7 +40,7 @@ export class DiscordWrapperImpl implements DiscordWrapper {
                     
                 }
                 this.client.on(eventString, callback);
-                logger.info(`(${plugin.getInfo().name}) Registered Event "${ctor.name}" to occur on ${eventString}`);
+                logger.verbose(`(${plugin.getInfo().name}) Registered Event "${ctor.name}" to occur on ${eventString}`);
             });
 
         });
