@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { Message } from "discord.js";
 import { injectable } from "inversify";
 import {Command, CommandInfo} from "."
-import { PluginDependencies } from "../../dependencyInjection/pluginDependencies";
+import { PluginDependencies } from "../services/pluginDependencies";
 import * as Logging from "../../logging";
 import { CommandFactory } from "./commandFactory";
 import { CommandConstructor, getPlugins } from "../../controller/pluginLoader";

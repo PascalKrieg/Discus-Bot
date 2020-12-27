@@ -1,10 +1,10 @@
 import "reflect-metadata";
 import { inject, injectable } from "inversify";
-import { CommandFactory } from "../model/commandFramework";
-import { Repository } from "../model/data/repository";
-import { SpotifyAPI } from "../model/services/spotify/spotifyApi";
+import { CommandFactory } from "../commandFramework";
+import { Repository } from "../data/repository";
+import { SpotifyAPI } from "./spotify/spotifyApi";
 import { PluginDependencies } from "./pluginDependencies";
-import { TYPES } from "./types";
+import { TYPES } from "../../dependencyInjection/types";
 
 @injectable()
 export class BasicPluginDependencies implements PluginDependencies {
