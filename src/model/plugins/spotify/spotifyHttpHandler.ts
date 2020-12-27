@@ -31,10 +31,11 @@ export class SpotifyHttpHandler {
 
             this.dependencies.spotifyApi.updateTokenPairFromState(state, code).then( () => {
                 res.statusCode = 200;
-                res.end()
+                res.send("Registration successfull!")
             }).catch((err) => {
+                logger.error(err)
                 res.statusCode = 500;
-                res.end()
+                res.send("Something went wrong! Registration not successful!")
             });
 
         });
