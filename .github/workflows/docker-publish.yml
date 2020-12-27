@@ -14,8 +14,7 @@ on:
   pull_request:
 
 env:
-  BOT_IMAGE_NAME: playback-enq-bot
-  REIGSTRATION_IMAGE_NAME: playback-enq-reg
+  BOT_IMAGE_NAME: bot
 
 jobs:
   # Run tests.
@@ -32,8 +31,7 @@ jobs:
             docker-compose --file docker-compose.test.yml build
             docker-compose --file docker-compose.test.yml run sut
           else
-            docker build ./bot --file ./bot/Dockerfile
-            docker build ./registration --file ./registration/Dockerfile
+            docker build .
           fi
 
   # Push image to GitHub Packages.
@@ -49,10 +47,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build bot image
-        run: docker build ./bot --file ./bot/Dockerfile --tag $BOT_IMAGE_NAME
-        
-      - name: Build register image
-        run: docker build ./bot --file ./registration/Dockerfile --tag $REIGSTRATION_IMAGE_NAME
+        run: docker build . --tag $BOT_IMAGE_NAME
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
@@ -79,28 +74,6 @@ jobs:
           docker tag $BOT_IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
-
-      - name: Push registration image
-        run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$REIGSTRATION_IMAGE_NAME
-
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=latest
-
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-
-          docker tag $REIGSTRATION_IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
           
       - name: Delete builder images
         run: |
