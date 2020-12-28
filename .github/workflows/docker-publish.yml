@@ -14,7 +14,7 @@ on:
   pull_request:
 
 env:
-  BOT_IMAGE_NAME: bot
+  BOT_IMAGE_NAME: discus
 
 jobs:
   # Run tests.

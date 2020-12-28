@@ -1,4 +1,4 @@
-# Discord Playback Enqueuer
+# Discus Bot
 ## Introduction
 This project is still in concept phase, therefore it only provides the most basic of functionality, maybe even less. Most importantly, it has not been tested for security issues, so this bot must not be used larger context than a small circle of friends.
 ## Prerequisites
@@ -27,7 +27,17 @@ MYSQL_PASSWORD      |The username of the user the bot uses to access the databas
 ### Starting the Bot
 To start the bot, execute ```docker-compose up --build``` in the root directory of the repository. This should start all the containers. If nothing goes wrong, the bot will be online and taking requests.
 
-## Available commands
+# Plugins
+## Base
+Contains the core commands and functionality.
+
+Command             | Parameters | Description
+---------------     | ---------- | ------------
+$ping               | *none*     | Echoes "pong"
+
+
+## Spotify
+Contains commands and events for creating spotify listening parties. Listening parties are text channels associated with the creators spotify account. Members of the channel can post song links which will be added to the hosts playback queue.
 Command             | Parameters | Description
 ---------------     | ---------- | ------------
 $registerMe         | *none*     | Sends a registration link to the user typing the command. If clicked on, the user tokens will be added to the database.
