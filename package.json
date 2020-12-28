@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Squamanto/discord-playback-enqueuer.git"
+    "url": "git+https://github.com/Squamanto/discus-bot.git"
   },
   "author": "Pascal Krieg",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Squamanto/discord-playback-enqueuer/issues"
+    "url": "https://github.com/Squamanto/discus-bot/issues"
   },
-  "homepage": "https://github.com/Squamanto/discord-playback-enqueuer#readme",
+  "homepage": "https://github.com/Squamanto/discus-bot#readme",
   "dependencies": {
     "discord.js": "^12.3.1",
     "express": "^4.17.1",
