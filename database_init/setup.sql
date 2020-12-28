@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS playback_enq.discord_users (
+CREATE TABLE IF NOT EXISTS discus.discord_users (
     id bigint NOT NULL,
     tag varchar(80),
     access_token varchar(255),
@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS playback_enq.discord_users (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS playback_enq.party_channels (
+CREATE TABLE IF NOT EXISTS discus.party_channels (
     id bigint NOT NULL,
     owner_id bigint NOT NULL,
     autodelete_date DATETIME,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS playback_enq.party_channels (
     CONSTRAINT fk_channel_owner FOREIGN KEY (owner_id) REFERENCES discord_users(id)
 );
 
-CREATE TABLE IF NOT EXISTS playback_enq.code_requests (
+CREATE TABLE IF NOT EXISTS discus.code_requests (
     request_id int NOT NULL AUTO_INCREMENT,
     discord_user bigint NOT NULL,
     request_state varchar(255) NOT NULL,

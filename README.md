@@ -1,10 +1,11 @@
-# Discord Playback Enqueuer
+# Discus Bot
 ## Introduction
-This project is still in concept phase, therefore it only provides the most basic of functionality, maybe even less. Most importantly, it has not been tested for security issues, so this bot must not be used larger context than a small circle of friends.
+This project aims to evolve into a simple discord bot, that provides some functionality that I wanted a bot to have. Most importantly, the project provides a framwork to program new functionality with as few lines of new code as possible.
 ## Prerequisites
-To run this bot, you need to have docker and docker-compose installed. The bot is tested on docker version 19.03.13 and docker-compose version 1.27.4. 
+To run this bot, you may want to use docker. The bot is tested on docker version 19.03.13 and docker-compose version 1.27.4.
+Alternatively, you can manually install Node.js and MariaDB and run it that way. This is highly discouraged though.
 ## Setup
-To start the bot, clone the repository and add the following files in the repository root and fill in the information:
+To start the bot, clone the repository and add the following environment files in the repository root and fill in the information:
 The file format is ``key=value`` with one key-value pair per line.
 ### Required Files
 #### bot-environment.env
@@ -20,14 +21,24 @@ REDIRECT_URI    | The redirect URI that spotify will use for the OAuth2.0 author
 Attribute           | Value
 ---------------     | ---------
 MYSQL_ROOT_PASSWORD | The root password for you mariadb instance. Can be used fairly randomly, as it will not be used and the database should not be accessible from outside the network.
-MYSQL_DATABASE      | The name for the database used.
+MYSQL_DATABASE      | The name for the database used. Currently, this needs to be set to "discus"
 MYSQL_USER          | The username of the user the bot uses to access the database defined in MYSQL_DATABASE.
 MYSQL_PASSWORD      |The username of the user the bot uses to access the database defined in MYSQL_DATABASE.
 
 ### Starting the Bot
 To start the bot, execute ```docker-compose up --build``` in the root directory of the repository. This should start all the containers. If nothing goes wrong, the bot will be online and taking requests.
 
-## Available commands
+# Plugins
+## Base
+Contains the core commands and functionality.
+
+Command             | Parameters | Description
+---------------     | ---------- | ------------
+$ping               | *none*     | Echoes "pong"
+
+
+## Spotify
+Contains commands and events for creating spotify listening parties. Listening parties are text channels associated with the creators spotify account. Members of the channel can post song links which will be added to the hosts playback queue.
 Command             | Parameters | Description
 ---------------     | ---------- | ------------
 $registerMe         | *none*     | Sends a registration link to the user typing the command. If clicked on, the user tokens will be added to the database.
